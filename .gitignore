@@ -1,0 +1,57 @@
+# Compiled binary files
+*.o
+*.out
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Compiled object files
+*.obj
+*.a
+*.lib
+
+# Log files
+*.log
+
+# macOS specific files
+.DS_Store
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.sublime-*
+
+# Build directories
+/bin/
+/build/
+/obj/
+/out/
+/dist/
+/node_modules/
+
+# Package files
+*.tar.gz
+*.zip
+
+# Dependency lock files
+yarn.lock
+package-lock.json
+Gemfile.lock
+composer.lock
+pipfile.lock
+
+# Environment files
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Miscellaneous
+Thumbs.db
+desktop.ini
+
+# Exclude specific files
+/path/to/specific_file.txt
