@@ -5,9 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var Db *gorm.DB
-
-func Setup() {
+func Setup() *gorm.DB {
 	print("Setting up database...\n")
 
 	var err error
@@ -20,5 +18,5 @@ func Setup() {
 
 	print("Database connected!\n")
 
-	Db = dbCon
+	return dbCon
 }

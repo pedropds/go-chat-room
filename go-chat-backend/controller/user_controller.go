@@ -8,7 +8,18 @@ import (
 	"strconv"
 )
 
-func Login(c *gin.Context) {
+type UserController interface {
+	GetAllUsers(c *gin.Context)
+	GetUserById(c *gin.Context)
+	CreateUser(c *gin.Context)
+	Login(c *gin.Context)
+}
+
+type UserControllerImpl struct {
+	Service service.UserService
+}
+
+func (cnt *UserControllerImpl) Login(c *gin.Context) {
 	var loginInfo model.LoginRequest
 
 	if err := c.ShouldBind(&loginInfo); err != nil {
@@ -16,7 +27,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	user := service.Login(loginInfo)
+	user := cnt.Service.Login(loginInfo)
 
 	if user == (model.User{}) {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "login failed"})
@@ -25,13 +36,13 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "login success", "result": user})
 }
 
-func GetAllUsers(c *gin.Context) {
-	users := service.GetAllUsers()
+func (cnt *UserControllerImpl) GetAllUsers(c *gin.Context) {
+	users := cnt.Service.GetAllUsers()
 
 	c.JSON(http.StatusOK, gin.H{"message": "get all users", "result": users})
 }
 
-func GetUserById(c *gin.Context) {
+func (cnt *UserControllerImpl) GetUserById(c *gin.Context) {
 	userId := c.Param("userId")
 	intVar, err := strconv.ParseInt(userId, 0, 8)
 	if err != nil {
@@ -39,11 +50,11 @@ func GetUserById(c *gin.Context) {
 		return
 	}
 
-	user := service.GetUserById(intVar)
+	user := cnt.Service.GetUserById(intVar)
 	c.JSON(http.StatusOK, gin.H{"message": "get user by id", "result": user})
 }
 
-func CreateUser(c *gin.Context) {
+func (cnt *UserControllerImpl) CreateUser(c *gin.Context) {
 	var user model.User
 
 	if err := c.ShouldBind(&user); err != nil {
@@ -51,7 +62,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	userResult := service.CreateUser(user)
+	userResult := cnt.Service.CreateUser(user)
 
 	c.JSON(http.StatusOK, gin.H{"message": "create user success", "result": userResult})
 }

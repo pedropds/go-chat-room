@@ -6,8 +6,8 @@ import (
 )
 
 func main() {
-	routersInit := router.Init()
-	model.Setup()
+	db := model.Setup()
+	routersInit := router.Init(db)
 
 	routersInit.Run(":8080")
 }

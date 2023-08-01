@@ -4,19 +4,30 @@ import (
 	"go-chat-backend/model"
 )
 
-func Login(loginInfo model.LoginRequest) model.User {
-	user := model.Login(loginInfo)
+type UserService interface {
+	GetAllUsers() []model.User
+	GetUserById(userId int64) model.User
+	CreateUser(user model.User) model.User
+	Login(loginInfo model.LoginRequest) model.User
+}
+
+type UserServiceImpl struct {
+	Repository model.UserRepository
+}
+
+func (s *UserServiceImpl) Login(loginInfo model.LoginRequest) model.User {
+	user := s.Repository.Login(loginInfo)
 	return user
 }
 
-func GetAllUsers() []model.User {
-	return model.GetAllUsers()
+func (s *UserServiceImpl) GetAllUsers() []model.User {
+	return s.Repository.GetAllUsers()
 }
 
-func GetUserById(userId int64) model.User {
-	return model.GetUserById(userId)
+func (s *UserServiceImpl) GetUserById(userId int64) model.User {
+	return s.Repository.GetUserById(userId)
 }
 
-func CreateUser(user model.User) model.User {
-	return model.CreateUser(user)
+func (s *UserServiceImpl) CreateUser(user model.User) model.User {
+	return s.Repository.CreateUser(user)
 }
