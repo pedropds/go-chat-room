@@ -33,13 +33,13 @@ func (cnt *UserControllerImpl) Login(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "login failed"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "login success", "result": user})
+	c.JSON(http.StatusOK, user)
 }
 
 func (cnt *UserControllerImpl) GetAllUsers(c *gin.Context) {
 	users := cnt.Service.GetAllUsers()
 
-	c.JSON(http.StatusOK, gin.H{"message": "get all users", "result": users})
+	c.JSON(http.StatusOK, users)
 }
 
 func (cnt *UserControllerImpl) GetUserById(c *gin.Context) {
@@ -51,7 +51,7 @@ func (cnt *UserControllerImpl) GetUserById(c *gin.Context) {
 	}
 
 	user := cnt.Service.GetUserById(intVar)
-	c.JSON(http.StatusOK, gin.H{"message": "get user by id", "result": user})
+	c.JSON(http.StatusOK, user)
 }
 
 func (cnt *UserControllerImpl) CreateUser(c *gin.Context) {
@@ -64,5 +64,5 @@ func (cnt *UserControllerImpl) CreateUser(c *gin.Context) {
 
 	userResult := cnt.Service.CreateUser(user)
 
-	c.JSON(http.StatusOK, gin.H{"message": "create user success", "result": userResult})
+	c.JSON(http.StatusOK, userResult)
 }
