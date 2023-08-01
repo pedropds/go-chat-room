@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"testProject/controller"
+	"go-chat-backend/controller"
 )
 
 func Init() *gin.Engine {

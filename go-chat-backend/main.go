@@ -1,8 +1,8 @@
 package main
 
 import (
-	"testProject/model"
-	"testProject/router"
+	"go-chat-backend/model"
+	"go-chat-backend/router"
 )
 
 func main() {

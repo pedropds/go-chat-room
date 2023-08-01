@@ -2,10 +2,10 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"go-chat-backend/model"
+	"go-chat-backend/service"
 	"net/http"
 	"strconv"
-	"testProject/model"
-	"testProject/service"
 )
 
 func Login(c *gin.Context) {

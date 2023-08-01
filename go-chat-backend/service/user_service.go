@@ -1,7 +1,7 @@
 package service
 
 import (
-	"testProject/model"
+	"go-chat-backend/model"
 )
 
 func Login(loginInfo model.LoginRequest) model.User {

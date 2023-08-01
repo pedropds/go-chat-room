@@ -1,4 +1,4 @@
-module testProject
+module go-chat-backend
 
 go 1.20
 
