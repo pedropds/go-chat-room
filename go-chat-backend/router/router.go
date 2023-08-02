@@ -22,10 +22,15 @@ func Init(db *gorm.DB) *gin.Engine {
 	var messageController controller.MessageController = &controller.MessageControllerImpl{Service: messageService}
 
 	//User endpoints
-	r.GET("/user", userController.GetAllUsers)
-	r.GET("/user/:userId", userController.GetUserById)
 	r.POST("/user/login", userController.Login)
-	r.POST("/user", userController.CreateUser)
+
+	userGroup := r.Group("/user")
+	userGroup.Use(Authenticate())
+	{
+		userGroup.GET("", userController.GetAllUsers)
+		userGroup.GET("/:userId", userController.GetUserById)
+		userGroup.POST("", userController.CreateUser)
+	}
 
 	//Message endpoints
 	r.GET("/message/:roomId", messageController.GetAllMessagesForRoom)
