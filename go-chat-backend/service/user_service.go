@@ -38,7 +38,7 @@ func GenerateJWT(user model.User) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
-	claims["exp"] = time.Now().Add(12 * time.Hour)
+	claims["exp"] = time.Now().Add(12 * time.Hour).Unix()
 	claims["userId"] = user.UserId
 	claims["username"] = user.Username
 	claims["email"] = user.Email
