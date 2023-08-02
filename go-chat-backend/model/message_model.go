@@ -16,5 +16,5 @@ type MessageResponse struct {
 	UserId    int        `json:"userId,omitempty"`
 	Username  string     `json:"username,omitempty"`
 	Content   string     `json:"content,omitempty"`
-	SentAt    *time.Time `json:"createdAt,omitempty"`
+	CreatedAt *time.Time `json:"createdAt,omitempty"`
 }

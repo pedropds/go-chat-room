@@ -33,7 +33,11 @@ func (cnt *UserControllerImpl) Login(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "login failed"})
 		return
 	}
-	c.JSON(http.StatusOK, user)
+
+	tokenString, _ := service.GenerateJWT(user)
+	token := model.UserToken{Token: tokenString}
+
+	c.JSON(http.StatusOK, token)
 }
 
 func (cnt *UserControllerImpl) GetAllUsers(c *gin.Context) {

@@ -22,3 +22,7 @@ type UserRequest struct {
 	Password string `json:"password" form:"password" binding:"required"`
 	Email    string `json:"email" form:"email" binding:"required"`
 }
+
+type UserToken struct {
+	Token string `json:"token"`
+}

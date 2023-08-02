@@ -7,5 +7,5 @@ CREATE TABLE message (
                          room_id INTEGER NOT NULL REFERENCES chat_room(room_id),
                          user_id INTEGER NOT NULL REFERENCES appuser(user_id),
                          content TEXT NOT NULL,
-                         sent_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
