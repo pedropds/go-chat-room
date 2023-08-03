@@ -38,10 +38,14 @@ func (wsImpl *WebSocketServiceImpl) OpenWebSocketConnection(c *gin.Context, chat
 		return
 	}
 
-	wsImpl.reader(wsValue, chatRoomId)
+	go wsImpl.reader(wsValue, chatRoomId)
 }
 
 func (wsImpl *WebSocketServiceImpl) reader(conn *websocket.Conn, chatRoomId int64) {
+	defer func() {
+		wsImpl.closeWebSocket(conn, chatRoomId)
+	}()
+
 	for {
 		_, p, err := conn.ReadMessage()
 		if err != nil {
@@ -98,4 +102,34 @@ func (wsImpl *WebSocketServiceImpl) broadcastMessageToChatRoom(chatRoomID int64,
 			}
 		}
 	}
+}
+
+func (wsImpl *WebSocketServiceImpl) closeWebSocket(conn *websocket.Conn, chatRoomId int64) {
+	// After the reader function exits, close the WebSocket connection.
+	conn.Close()
+
+	// Remove the WebSocket connection from the map when it is closed.
+	connectionsInterface, found := wsImpl.ChatRoomConnectionsMap.Load(chatRoomId)
+	if !found {
+		return // Chat room not found in the map.
+	}
+
+	connections, ok := connectionsInterface.([]*websocket.Conn)
+	if !ok {
+		return // Incorrect type stored in the map.
+	}
+
+	// Find and remove the WebSocket connection from the list.
+	for i, existingConn := range connections {
+		if existingConn == conn {
+			connections = append(connections[:i], connections[i+1:]...)
+			break
+		}
+	}
+
+	// Update the map with the new list of connections.
+	wsImpl.ChatRoomConnectionsMap.Store(chatRoomId, connections)
+	connectionsSize := len(connections)
+
+	log.Printf("One WebSocket connection for chat_room %d closed. %d connections remaining", chatRoomId, connectionsSize)
 }
