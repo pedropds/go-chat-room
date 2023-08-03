@@ -1,6 +1,8 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type MessageRepository interface {
 	GetAllMessagesForRoom(roomId int64) []MessageResponse

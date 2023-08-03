@@ -1,9 +1,12 @@
 package service
 
-import "go-chat-backend/model"
+import (
+	"go-chat-backend/model"
+)
 
 type MessageService interface {
 	GetAllMessagesForRoom(roomId int64) []model.MessageResponse
+	CreateMessage(message model.Message) model.Message
 }
 
 type MessageServiceImpl struct {
@@ -12,4 +15,8 @@ type MessageServiceImpl struct {
 
 func (s *MessageServiceImpl) GetAllMessagesForRoom(roomId int64) []model.MessageResponse {
 	return s.Repository.GetAllMessagesForRoom(roomId)
+}
+
+func (s *MessageServiceImpl) CreateMessage(message model.Message) model.Message {
+	return s.Repository.CreateMessage(message)
 }
