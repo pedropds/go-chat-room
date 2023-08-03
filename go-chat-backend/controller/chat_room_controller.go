@@ -9,10 +9,12 @@ import (
 
 type ChatRoomController interface {
 	GetAllChatRoomsForUser(c *gin.Context)
+	OpenChatRoomConnection(c *gin.Context)
 }
 
 type ChatRoomControllerImpl struct {
-	Service service.ChatRoomService
+	Service          service.ChatRoomService
+	WebSocketService service.WebSocketService
 }
 
 func (cnt *ChatRoomControllerImpl) GetAllChatRoomsForUser(c *gin.Context) {
@@ -26,4 +28,16 @@ func (cnt *ChatRoomControllerImpl) GetAllChatRoomsForUser(c *gin.Context) {
 
 	chatRooms := cnt.Service.GetAllChatRoomsForUser(intVar)
 	c.JSON(http.StatusOK, chatRooms)
+}
+
+func (cnt *ChatRoomControllerImpl) OpenChatRoomConnection(c *gin.Context) {
+	chatRoomIdString := c.Param("chatRoomId")
+
+	chatRoomId, err := strconv.ParseInt(chatRoomIdString, 0, 8)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	cnt.WebSocketService.OpenWebSocketConnection(c, chatRoomId)
 }

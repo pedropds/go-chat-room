@@ -6,7 +6,7 @@ import (
 
 type MessageService interface {
 	GetAllMessagesForRoom(roomId int64) []model.MessageResponse
-	CreateMessage(message model.Message) model.Message
+	CreateMessage(message model.Message) model.MessageResponse
 }
 
 type MessageServiceImpl struct {
@@ -17,6 +17,6 @@ func (s *MessageServiceImpl) GetAllMessagesForRoom(roomId int64) []model.Message
 	return s.Repository.GetAllMessagesForRoom(roomId)
 }
 
-func (s *MessageServiceImpl) CreateMessage(message model.Message) model.Message {
+func (s *MessageServiceImpl) CreateMessage(message model.Message) model.MessageResponse {
 	return s.Repository.CreateMessage(message)
 }

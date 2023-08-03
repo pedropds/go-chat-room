@@ -6,6 +6,7 @@ import (
 	"go-chat-backend/model"
 	"go-chat-backend/service"
 	"gorm.io/gorm"
+	"sync"
 )
 
 func Init(db *gorm.DB) *gin.Engine {
@@ -21,10 +22,22 @@ func Init(db *gorm.DB) *gin.Engine {
 	var messageService service.MessageService = &service.MessageServiceImpl{Repository: messageRepository}
 	var messageController controller.MessageController = &controller.MessageControllerImpl{Service: messageService}
 
+	//create WebSocket Dependencies
+	var webSocketService service.WebSocketService = &service.WebSocketServiceImpl{
+		Ms:                     messageService,
+		ChatRoomConnectionsMap: sync.Map{},
+	}
+
 	// create ChatRoom Dependencies
 	var chatRoomRepository model.ChatRoomRepository = &model.ChatRoomRepositoryImpl{Db: db}
 	var chatRoomService service.ChatRoomService = &service.ChatRoomServiceImpl{Repository: chatRoomRepository}
-	var chatRoomController controller.ChatRoomController = &controller.ChatRoomControllerImpl{Service: chatRoomService}
+	var chatRoomController controller.ChatRoomController = &controller.ChatRoomControllerImpl{
+		Service:          chatRoomService,
+		WebSocketService: webSocketService,
+	}
+
+	//WebSocket endpoint
+	r.GET("/chat-connect/:chatRoomId", chatRoomController.OpenChatRoomConnection)
 
 	//User endpoints
 	r.POST("/user/login", userController.Login)
