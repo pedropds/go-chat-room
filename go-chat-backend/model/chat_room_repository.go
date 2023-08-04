@@ -6,6 +6,7 @@ import (
 
 type ChatRoomRepository interface {
 	GetAllChatRoomsForUser(userId int64) []ChatRoom
+	CreateChatRoom(chatRoom ChatRoom) ChatRoom
 }
 
 type ChatRoomRepositoryImpl struct {
@@ -26,4 +27,14 @@ func (r *ChatRoomRepositoryImpl) GetAllChatRoomsForUser(userId int64) []ChatRoom
 		Find(&chatRooms)
 
 	return chatRooms
+}
+
+func (r *ChatRoomRepositoryImpl) CreateChatRoom(chatRoom ChatRoom) ChatRoom {
+	result := r.Db.Create(&chatRoom)
+
+	if result.Error != nil {
+		return ChatRoom{}
+	}
+
+	return chatRoom
 }

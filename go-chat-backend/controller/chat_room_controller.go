@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"go-chat-backend/model"
 	"go-chat-backend/service"
 	"net/http"
 	"strconv"
@@ -9,12 +10,15 @@ import (
 
 type ChatRoomController interface {
 	GetAllChatRoomsForUser(c *gin.Context)
+	CreateChatRoom(c *gin.Context)
+	JoinChatRoom(c *gin.Context)
 	OpenChatRoomConnection(c *gin.Context)
 }
 
 type ChatRoomControllerImpl struct {
-	Service          service.ChatRoomService
-	WebSocketService service.WebSocketService
+	ChatRoomService   service.ChatRoomService
+	MembershipService service.MembershipService
+	WebSocketService  service.WebSocketService
 }
 
 func (cnt *ChatRoomControllerImpl) GetAllChatRoomsForUser(c *gin.Context) {
@@ -26,8 +30,31 @@ func (cnt *ChatRoomControllerImpl) GetAllChatRoomsForUser(c *gin.Context) {
 		return
 	}
 
-	chatRooms := cnt.Service.GetAllChatRoomsForUser(intVar)
+	chatRooms := cnt.ChatRoomService.GetAllChatRoomsForUser(intVar)
 	c.JSON(http.StatusOK, chatRooms)
+}
+
+func (cnt *ChatRoomControllerImpl) CreateChatRoom(c *gin.Context) {
+	var chatRoom model.ChatRoom
+
+	if err := c.ShouldBind(&chatRoom); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	createdChatRoom := cnt.ChatRoomService.CreateChatRoom(chatRoom)
+	c.JSON(http.StatusOK, createdChatRoom)
+}
+
+func (cnt *ChatRoomControllerImpl) JoinChatRoom(c *gin.Context) {
+	var memberShipRequest model.Membership
+
+	if err := c.ShouldBind(&memberShipRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	cnt.MembershipService.JoinChatRoom(memberShipRequest.UserId, memberShipRequest.RoomId)
 }
 
 func (cnt *ChatRoomControllerImpl) OpenChatRoomConnection(c *gin.Context) {
