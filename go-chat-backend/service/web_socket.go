@@ -45,7 +45,7 @@ func (wsImpl *WebSocketServiceImpl) reader(conn *websocket.Conn, chatRoomId int6
 	for {
 		_, p, err := conn.ReadMessage()
 		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) && err.(*websocket.CloseError).Code != 1000 {
 				log.Printf("error: %v", err)
 			}
 			break
@@ -75,7 +75,7 @@ func (wsImpl *WebSocketServiceImpl) createWebSocket(c *gin.Context, chatRoomId i
 
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 		return nil
 	}
 
@@ -92,7 +92,7 @@ func (wsImpl *WebSocketServiceImpl) broadcastMessageToChatRoom(chatRoomID int64,
 		if conn != nil {
 			err := conn.WriteMessage(websocket.TextMessage, payload)
 			if err != nil {
-				log.Printf("Error broadcasting message to WebSocket: %v", err)
+				log.Fatalf("Error broadcasting message to WebSocket: %v", err)
 			}
 		}
 	}

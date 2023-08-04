@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go-chat-backend/controller"
 	"go-chat-backend/model"
@@ -11,6 +12,7 @@ import (
 
 func Init(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
+	r.Use(cors.Default())
 
 	// create User Dependencies
 	var userRepository model.UserRepository = &model.UserRepositoryImpl{Db: db}
