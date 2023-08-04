@@ -2,12 +2,10 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"go-chat-backend/model"
 	"log"
-	"net/http"
 	"sync"
 )
 
@@ -19,16 +17,13 @@ type WebSocketService interface {
 }
 
 type WebSocketServiceImpl struct {
-	Ms                     MessageService
+	MessageService         MessageService
 	ChatRoomConnectionsMap sync.Map
 }
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
 }
 
 func (wsImpl *WebSocketServiceImpl) OpenWebSocketConnection(c *gin.Context, chatRoomId int64) {
@@ -55,20 +50,18 @@ func (wsImpl *WebSocketServiceImpl) reader(conn *websocket.Conn, chatRoomId int6
 			break
 		}
 
-		fmt.Println(string(p))
-
 		message := &model.Message{}
 		err = json.Unmarshal(p, message)
 		if err != nil {
 			log.Println(err)
-			return
+			panic("Error unmarshalling message! Error: " + err.Error())
 		}
 
-		messageResponse := wsImpl.Ms.CreateMessage(*message)
+		messageResponse := wsImpl.MessageService.CreateMessage(*message)
 		messageResponseBytes, errorMarshal := json.Marshal(messageResponse)
 		if errorMarshal != nil {
 			log.Println(errorMarshal)
-			return
+			panic("Error marshalling message! Error: " + errorMarshal.Error())
 		}
 
 		wsImpl.broadcastMessageToChatRoom(chatRoomId, messageResponseBytes)
