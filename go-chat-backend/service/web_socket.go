@@ -14,6 +14,7 @@ type WebSocketService interface {
 	reader(conn *websocket.Conn, chatRoomId int64)
 	createWebSocket(c *gin.Context, chatRoomId int64) *websocket.Conn
 	broadcastMessageToChatRoom(chatRoomId int64, payload []byte)
+	closeWebSocket(conn *websocket.Conn, chatRoomId int64)
 }
 
 type WebSocketServiceImpl struct {
