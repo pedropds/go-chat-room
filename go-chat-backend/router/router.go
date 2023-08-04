@@ -24,16 +24,19 @@ func Init(db *gorm.DB) *gin.Engine {
 
 	//create WebSocket Dependencies
 	var webSocketService service.WebSocketService = &service.WebSocketServiceImpl{
-		Ms:                     messageService,
+		MessageService:         messageService,
 		ChatRoomConnectionsMap: sync.Map{},
 	}
 
 	// create ChatRoom Dependencies
 	var chatRoomRepository model.ChatRoomRepository = &model.ChatRoomRepositoryImpl{Db: db}
+	var membershipRepository model.MembershipRepository = &model.MembershipRepositoryImpl{Db: db}
 	var chatRoomService service.ChatRoomService = &service.ChatRoomServiceImpl{Repository: chatRoomRepository}
+	var membershipService service.MembershipService = &service.MembershipServiceImpl{Repository: membershipRepository}
 	var chatRoomController controller.ChatRoomController = &controller.ChatRoomControllerImpl{
-		Service:          chatRoomService,
-		WebSocketService: webSocketService,
+		ChatRoomService:   chatRoomService,
+		MembershipService: membershipService,
+		WebSocketService:  webSocketService,
 	}
 
 	//WebSocket endpoint
@@ -54,7 +57,9 @@ func Init(db *gorm.DB) *gin.Engine {
 	r.GET("/message/:roomId", messageController.GetAllMessagesForRoom)
 
 	//ChatRoom endpoints
+	r.POST("/chatroom", chatRoomController.CreateChatRoom)
 	r.GET("/chatroom/:userId", chatRoomController.GetAllChatRoomsForUser)
+	r.POST("/chatroom/join", chatRoomController.JoinChatRoom)
 
 	return r
 }
