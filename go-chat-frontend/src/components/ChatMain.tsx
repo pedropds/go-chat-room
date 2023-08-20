@@ -20,16 +20,23 @@ export default class ChatList extends Component<{}, ChatListState> {
     }
 
     render() {
+        const { chatList } = this.state;
         return (
             <View style={styles.container}>
-                <FlatList style={styles.chatList} data={this.state.chatList} renderItem={({ item }) =>
-                    <TouchableOpacity onPress={() => this.handleItemPress(item)}>
-                        <View style={styles.item}>
-                            <LetterIcon initials='AS'></LetterIcon>
-                            <Text>{item.roomName}</Text>
-                        </View>
-                    </TouchableOpacity>
-                } />
+                <FlatList style={styles.chatList} data={this.state.chatList}
+                    renderItem={({ item, index }) => (
+                        <TouchableOpacity
+                            style={[
+                                styles.item,
+                                index === 0 && styles.firstItem, 
+                            ]}
+                            onPress={() => this.handleItemPress(item)}
+                        >
+                            <LetterIcon initials='As' />
+                            <Text style={styles.text}>{item.roomName}</Text>
+                        </TouchableOpacity>
+                    )}
+                />
             </View>
         );
     }
@@ -74,13 +81,23 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         width: '100%'
     },
-    //width: '100%'
     chatList: {
         flex: 1,
         width: '100%'
     },
     item: {
         flex: 1,
+        flexDirection: 'row',
         padding: 10,
+        borderTopWidth: 1,
+    },
+    text: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignContent: 'center',
+        paddingLeft: 10,
+    },
+    firstItem: {
+        borderTopWidth: 0, // remove top border from first item
     }
 });
