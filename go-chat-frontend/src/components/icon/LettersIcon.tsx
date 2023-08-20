@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { THEME_COLORS } from "../../Constants";
 
 interface LetterIconProps {
     initials: string;
@@ -30,12 +31,12 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 25,
         borderWidth: 2,
-        borderColor: 'black',
+        borderColor: THEME_COLORS.ROOM_COLOR,
         justifyContent: 'center',
         alignItems: 'center',
     },
     text: {
-        color: 'black',
+        color: THEME_COLORS.ROOM_COLOR,
         fontSize: 25,
     },
 });

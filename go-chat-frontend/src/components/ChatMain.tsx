@@ -4,6 +4,7 @@ import axios from 'axios';
 import ChatRoomDTO from '../model/chat.model';
 import { FlatList } from 'react-native-gesture-handler';
 import LetterIcon from './icon/LettersIcon';
+import { THEME_COLORS } from '../Constants';
 
 
 interface ChatListState {
@@ -32,7 +33,7 @@ export default class ChatList extends Component<{}, ChatListState> {
                             ]}
                             onPress={() => this.handleItemPress(item)}
                         >
-                            <LetterIcon initials='As' />
+                            <LetterIcon initials={this.getInitials(item.roomName)} />
                             <Text style={styles.text}>{item.roomName}</Text>
                         </TouchableOpacity>
                     )}
@@ -71,12 +72,17 @@ export default class ChatList extends Component<{}, ChatListState> {
             });
             */
     }
+
+    getInitials(str: string): string {
+        return str.substring(0, 2);
+    }
+
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#232c31',
         alignItems: 'center',
         justifyContent: 'center',
         width: '100%'
@@ -96,8 +102,9 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         alignContent: 'center',
         paddingLeft: 10,
+        color: THEME_COLORS.ROOM_COLOR,
     },
     firstItem: {
-        borderTopWidth: 0, // remove top border from first item
+        borderTopWidth: 0,
     }
 });

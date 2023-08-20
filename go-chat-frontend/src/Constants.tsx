@@ -1,0 +1,6 @@
+export const THEME_COLORS = {
+    BACKGROUND_MENU_COLOR: '#1d2528',
+    ACTIVE_SCREEN_TAB: '#bcccdc',
+    INACTIVE_SCREEN_TAB: '#3c4d54',
+    ROOM_COLOR: '#3c4d54',
+}
