@@ -82,7 +82,7 @@ export default class ChatList extends Component<{}, ChatListState> {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#232c31',
+        backgroundColor: THEME_COLORS.CHAT_LIST_COLOR,
         alignItems: 'center',
         justifyContent: 'center',
         width: '100%'
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         alignContent: 'center',
         paddingLeft: 10,
-        color: THEME_COLORS.ROOM_COLOR,
+        color: THEME_COLORS.INITIALS_ROOM_COLOR,
     },
     firstItem: {
         borderTopWidth: 0,
