@@ -1,18 +1,21 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import axios from 'axios';
-import ChatRoomDTO from '../model/chat.model';
 import { FlatList } from 'react-native-gesture-handler';
 import LetterIcon from './icon/LettersIcon';
 import { THEME_COLORS } from '../Constants';
+import { ChatRoomDTO } from '../model/chat.model';
 
+interface ChatListProps {
+    navigation: any; 
+}
 
 interface ChatListState {
     chatList: ChatRoomDTO[];
 }
 
-export default class ChatList extends Component<{}, ChatListState> {
-
+export default class ChatList extends Component<ChatListProps, ChatListState> {
+    
     constructor(props: any) {
         super(props);
         this.state = {
@@ -43,7 +46,7 @@ export default class ChatList extends Component<{}, ChatListState> {
     }
 
     handleItemPress(item: ChatRoomDTO) {
-        console.log(item);
+        this.props.navigation.navigate('OpenChat', { chatRoom: item });
     }
 
     componentDidMount() {
@@ -108,3 +111,4 @@ const styles = StyleSheet.create({
         borderTopWidth: 0,
     }
 });
+

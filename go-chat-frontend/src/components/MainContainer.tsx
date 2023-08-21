@@ -4,9 +4,10 @@ import React from "react";
 import { Ionicons } from '@expo/vector-icons';
 
 
-import ChatList from "./ChatMain";
+import ChatList from "./ChatListSelection";
 import SettingsComp from "./Settings";
 import { THEME_COLORS } from "../Constants";
+import OpenChat from "./OpenChat";
 
 
 const Tab = createBottomTabNavigator();
@@ -35,6 +36,11 @@ export default class MainContainer extends React.Component {
                     })}>
                     <Tab.Screen name="Chats" component={ChatList} />
                     <Tab.Screen name="Settings" component={SettingsComp} />
+                    <Tab.Screen name="OpenChat" component={OpenChat}
+                        options={{
+                            tabBarButton: () => null
+                        }}
+                    />
                 </Tab.Navigator>
             </NavigationContainer>
         );
