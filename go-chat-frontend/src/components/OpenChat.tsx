@@ -1,18 +1,25 @@
 import React, { Component } from "react";
-import { ChatMessageDTO } from "../model/chat.model";
+import { ChatMessageDTO, ChatRoomDTO } from "../model/chat.model";
 import { FlatList, View, Text } from "react-native";
 
 
 interface OpenChatState {
     chatMessages: ChatMessageDTO[];
+    chatRoom: ChatRoomDTO | null;
 }
 
-export default class OpenChat extends Component<{}, OpenChatState> {
+interface OpenChatProps {
+    navigation: any;
+    route: any;
+}
+
+export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
 
     constructor(props: any) {
         super(props);
         this.state = {
-            chatMessages: []
+            chatMessages: [],
+            chatRoom: null
         };
     }
 
@@ -29,6 +36,9 @@ export default class OpenChat extends Component<{}, OpenChatState> {
     }
 
     componentDidMount(): void {
+        console.log(this.props.route.params.chatRoom);
+        const chatRoom: ChatRoomDTO = this.props.route.params.chatRoom;
+        //TODO fetch real messages
         const chatMessages: ChatMessageDTO[] = [
             { messageId: 1, roomId: 1, userId: 1, content: "Hello", createdAt: "2021-01-01" },
             { messageId: 2, roomId: 1, userId: 2, content: "Hi", createdAt: "2021-01-01" },
@@ -41,6 +51,16 @@ export default class OpenChat extends Component<{}, OpenChatState> {
             { messageId: 9, roomId: 1, userId: 1, content: "Bye", createdAt: "2021-01-01" },
             { messageId: 10, roomId: 1, userId: 2, content: "Bye", createdAt: "2021-01-01" },
         ];
-        this.setState({ chatMessages });
+        this.setState({ chatMessages, chatRoom });
+    }
+
+    componentDidUpdate(prevProps: any): void {
+        const chatRoom: ChatRoomDTO = this.props.route.params.chatRoom;
+
+        if (prevProps.route.params.chatRoom.roomId === chatRoom.roomId)
+            return;
+
+        //TODO fetch new messages
+        console.log(this.props.route.params.chatRoom);
     }
 }
