@@ -1,11 +1,14 @@
 import React, { Component } from "react";
 import { ChatMessageDTO, ChatRoomDTO } from "../model/chat.model";
-import { FlatList, View, Text } from "react-native";
+import { FlatList, View, Text, Animated } from "react-native";
+import { useIsFocused } from "@react-navigation/native";
+import { withNavigationFocus } from "react-navigation";
 
 
 interface OpenChatState {
     chatMessages: ChatMessageDTO[];
     chatRoom: ChatRoomDTO | null;
+    fadeAnim: Animated.Value;
 }
 
 interface OpenChatProps {
@@ -13,30 +16,35 @@ interface OpenChatProps {
     route: any;
 }
 
-export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
+class OpenChat extends Component<OpenChatProps, OpenChatState> {
 
     constructor(props: any) {
         super(props);
         this.state = {
             chatMessages: [],
-            chatRoom: null
+            chatRoom: null,
+            fadeAnim: new Animated.Value(-100)
         };
     }
 
     render() {
+        const { fadeAnim } = this.state;
         return (
-            <View>
+            <Animated.View style={[
+                {
+                    transform: [{ translateX: fadeAnim }],
+                },
+            ]}>
                 <FlatList data={this.state.chatMessages}
                     renderItem={({ item, index }) => (
                         <Text>{item.content}</Text>
                     )}
                 />
-            </View>
+            </Animated.View>
         );
     }
 
     componentDidMount(): void {
-        console.log(this.props.route.params.chatRoom);
         const chatRoom: ChatRoomDTO = this.props.route.params.chatRoom;
         //TODO fetch real messages
         const chatMessages: ChatMessageDTO[] = [
@@ -55,6 +63,9 @@ export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
     }
 
     componentDidUpdate(prevProps: any): void {
+        this.state.fadeAnim.setValue(-100);
+        this.animateIn();
+        
         const chatRoom: ChatRoomDTO = this.props.route.params.chatRoom;
 
         if (prevProps.route.params.chatRoom.roomId === chatRoom.roomId)
@@ -63,4 +74,23 @@ export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
         //TODO fetch new messages
         console.log(this.props.route.params.chatRoom);
     }
+
+    private animateIn = () => {
+        Animated.timing(this.state.fadeAnim, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+        }).start();
+    };
+
+    private animateOut = () => {
+        Animated.timing(this.state.fadeAnim, {
+            toValue: -100,
+            duration: 500,
+            useNativeDriver: true,
+        }).start();
+    }
+    
 }
+
+export default withNavigationFocus(OpenChat);
