@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import axios from 'axios';
 import { FlatList } from 'react-native-gesture-handler';
 import LetterIcon from './icon/LettersIcon';
@@ -7,32 +7,34 @@ import { THEME_COLORS } from '../Constants';
 import { ChatRoomDTO } from '../model/chat.model';
 
 interface ChatListProps {
-    navigation: any; 
+    navigation: any;
 }
 
 interface ChatListState {
     chatList: ChatRoomDTO[];
+    fadeAnim: Animated.Value;
 }
 
 export default class ChatList extends Component<ChatListProps, ChatListState> {
-    
+
     constructor(props: any) {
         super(props);
         this.state = {
-            chatList: []
+            chatList: [],
+            fadeAnim: new Animated.Value(0)
         };
     }
 
     render() {
-        const { chatList } = this.state;
+        const { fadeAnim } = this.state;
         return (
-            <View style={styles.container}>
+            <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
                 <FlatList style={styles.chatList} data={this.state.chatList}
                     renderItem={({ item, index }) => (
                         <TouchableOpacity
                             style={[
                                 styles.item,
-                                index === 0 && styles.firstItem, 
+                                index === 0 && styles.firstItem,
                             ]}
                             onPress={() => this.handleItemPress(item)}
                         >
@@ -41,7 +43,7 @@ export default class ChatList extends Component<ChatListProps, ChatListState> {
                         </TouchableOpacity>
                     )}
                 />
-            </View>
+            </Animated.View>
         );
     }
 
@@ -50,6 +52,12 @@ export default class ChatList extends Component<ChatListProps, ChatListState> {
     }
 
     componentDidMount() {
+        Animated.timing(this.state.fadeAnim, {
+            toValue: 1,
+            duration: 250,
+            useNativeDriver: true,
+        }).start();
+
         let chatList: ChatRoomDTO[] = [
             { roomId: 1, roomName: "Room 1", createdAt: "2021-01-01", creatorId: 1 },
             { roomId: 2, roomName: "Room 2", createdAt: "2021-01-01", creatorId: 1 },
@@ -88,7 +96,7 @@ const styles = StyleSheet.create({
         backgroundColor: THEME_COLORS.CHAT_LIST_COLOR,
         alignItems: 'center',
         justifyContent: 'center',
-        width: '100%'
+        width: '100%',
     },
     chatList: {
         flex: 1,

@@ -16,8 +16,10 @@ export default class MainContainer extends React.Component {
     render() {
         return (
             <NavigationContainer>
-                <Tab.Navigator initialRouteName="Chats"
+                <Tab.Navigator 
+                    initialRouteName="Chats"
                     screenOptions={({ route }) => ({
+                        animationEnabled: true,
                         headerShown: false,
                         tabBarIcon: ({ focused, color, size }) => {
                             let iconName: any = "";
