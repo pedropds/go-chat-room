@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import { ChatMessageDTO, ChatRoomDTO } from "../model/chat.model";
-import { FlatList, View, Text, Animated } from "react-native";
+import { FlatList, View, Text, Animated, StyleSheet } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { withNavigationFocus } from "react-navigation";
+import { THEME_COLORS } from "../Constants";
 
 
 interface OpenChatState {
@@ -16,7 +17,7 @@ interface OpenChatProps {
     route: any;
 }
 
-class OpenChat extends Component<OpenChatProps, OpenChatState> {
+export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
 
     constructor(props: any) {
         super(props);
@@ -26,18 +27,15 @@ class OpenChat extends Component<OpenChatProps, OpenChatState> {
             fadeAnim: new Animated.Value(-100)
         };
     }
-
     render() {
         const { fadeAnim } = this.state;
         return (
-            <Animated.View style={[
-                {
-                    transform: [{ translateX: fadeAnim }],
-                },
-            ]}>
+            <Animated.View style={[styles.container]}>
                 <FlatList data={this.state.chatMessages}
                     renderItem={({ item, index }) => (
-                        <Text>{item.content}</Text>
+                        <View style={styles.messageBox}>
+                            <Text style={styles.messageText}>{item.content}</Text>
+                        </View>
                     )}
                 />
             </Animated.View>
@@ -63,9 +61,6 @@ class OpenChat extends Component<OpenChatProps, OpenChatState> {
     }
 
     componentDidUpdate(prevProps: any): void {
-        this.state.fadeAnim.setValue(-100);
-        this.animateIn();
-        
         const chatRoom: ChatRoomDTO = this.props.route.params.chatRoom;
 
         if (prevProps.route.params.chatRoom.roomId === chatRoom.roomId)
@@ -75,22 +70,25 @@ class OpenChat extends Component<OpenChatProps, OpenChatState> {
         console.log(this.props.route.params.chatRoom);
     }
 
-    private animateIn = () => {
-        Animated.timing(this.state.fadeAnim, {
-            toValue: 0,
-            duration: 500,
-            useNativeDriver: true,
-        }).start();
-    };
-
-    private animateOut = () => {
-        Animated.timing(this.state.fadeAnim, {
-            toValue: -100,
-            duration: 500,
-            useNativeDriver: true,
-        }).start();
-    }
-    
 }
 
-export default withNavigationFocus(OpenChat);
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: THEME_COLORS.CHAT_LIST_COLOR,
+    },
+    messageBox: {
+        padding: 10,
+        borderRadius: 20,
+        borderColor: THEME_COLORS.INACTIVE_SCREEN_TAB,
+        borderWidth: 1,
+        marginBottom: 10,
+        maxWidth: '80%',
+        alignSelf: 'flex-start',
+    },
+    messageText: {
+        fontSize: 16,
+        color: THEME_COLORS.ACTIVE_SCREEN_TAB,
+    }
+});
+
