@@ -24,5 +24,6 @@ type UserRequest struct {
 }
 
 type UserToken struct {
-	Token string `json:"token"`
+	Username string `json:"username"`
+	Token    string `json:"token"`
 }

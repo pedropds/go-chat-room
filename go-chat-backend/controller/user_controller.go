@@ -35,7 +35,7 @@ func (cnt *UserControllerImpl) Login(c *gin.Context) {
 	}
 
 	tokenString, _ := service.GenerateJWT(user)
-	token := model.UserToken{Token: tokenString}
+	token := model.UserToken{Token: tokenString, Username: user.Username}
 
 	c.JSON(http.StatusOK, token)
 }
