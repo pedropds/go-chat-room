@@ -9,6 +9,7 @@ export interface ChatMessageDTO {
     messageId: number;
     roomId: number;
     userId: number;
+    username: string;
     content: string;
     createdAt: string;
 }
