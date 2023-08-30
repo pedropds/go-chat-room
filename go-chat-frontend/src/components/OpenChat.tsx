@@ -4,12 +4,13 @@ import { FlatList, View, Text, Animated, StyleSheet } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { withNavigationFocus } from "react-navigation";
 import { THEME_COLORS } from "../Constants";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 interface OpenChatState {
     chatMessages: ChatMessageDTO[];
     chatRoom: ChatRoomDTO | null;
-    fadeAnim: Animated.Value;
+    username: string | null;
 }
 
 interface OpenChatProps {
@@ -24,40 +25,50 @@ export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
         this.state = {
             chatMessages: [],
             chatRoom: null,
-            fadeAnim: new Animated.Value(-100)
+            username: null,
         };
     }
+
     render() {
-        const { fadeAnim } = this.state;
         return (
-            <Animated.View style={[styles.container]}>
+            <View style={[styles.container]}>
                 <FlatList data={this.state.chatMessages}
-                    renderItem={({ item, index }) => (
-                        <View style={styles.messageBox}>
-                            <Text style={styles.messageText}>{item.content}</Text>
-                        </View>
-                    )}
+                    renderItem={({ item, index }) => {
+                        const messageBoxStyle = item.username === this.state.username
+                            ? styles.messageFromOther
+                            : styles.messageBox;
+
+                        return (
+                            <View style={[messageBoxStyle]}>
+                                <Text style={styles.messageText}>{item.content}</Text>
+                            </View>
+                        );
+                    }}
                 />
-            </Animated.View>
+            </View>
         );
     }
 
-    componentDidMount(): void {
+    async componentDidMount() {
         const chatRoom: ChatRoomDTO = this.props.route.params.chatRoom;
         //TODO fetch real messages
         const chatMessages: ChatMessageDTO[] = [
-            { messageId: 1, roomId: 1, userId: 1, content: "Hello", createdAt: "2021-01-01" },
-            { messageId: 2, roomId: 1, userId: 2, content: "Hi", createdAt: "2021-01-01" },
-            { messageId: 3, roomId: 1, userId: 1, content: "How are you?", createdAt: "2021-01-01" },
-            { messageId: 4, roomId: 1, userId: 2, content: "I'm fine, thanks", createdAt: "2021-01-01" },
-            { messageId: 5, roomId: 1, userId: 1, content: "Good to hear", createdAt: "2021-01-01" },
-            { messageId: 6, roomId: 1, userId: 2, content: "How about you?", createdAt: "2021-01-01" },
-            { messageId: 7, roomId: 1, userId: 1, content: "I'm fine too", createdAt: "2021-01-01" },
-            { messageId: 8, roomId: 1, userId: 2, content: "Good to hear", createdAt: "2021-01-01" },
-            { messageId: 9, roomId: 1, userId: 1, content: "Bye", createdAt: "2021-01-01" },
-            { messageId: 10, roomId: 1, userId: 2, content: "Bye", createdAt: "2021-01-01" },
+            { messageId: 1, roomId: 1, userId: 1, username: "pedropds", content: "Hello", createdAt: "2021-01-01" },
+            { messageId: 2, roomId: 1, userId: 2, username: "some_user", content: "Hi", createdAt: "2021-01-01" },
+            { messageId: 3, roomId: 1, userId: 1, username: "pedropds", content: "How are you?", createdAt: "2021-01-01" },
+            { messageId: 4, roomId: 1, userId: 2, username: "some_user", content: "I'm fine, thanks", createdAt: "2021-01-01" },
+            { messageId: 5, roomId: 1, userId: 1, username: "pedropds", content: "Good to hear", createdAt: "2021-01-01" },
+            { messageId: 6, roomId: 1, userId: 2, username: "some_user", content: "How about you?", createdAt: "2021-01-01" },
+            { messageId: 7, roomId: 1, userId: 1, username: "pedropds", content: "I'm fine too", createdAt: "2021-01-01" },
+            { messageId: 8, roomId: 1, userId: 2, username: "some_user", content: "Good to hear", createdAt: "2021-01-01" },
+            { messageId: 9, roomId: 1, userId: 1, username: "pedropds", content: "Bye", createdAt: "2021-01-01" },
+            { messageId: 10, roomId: 1, userId: 2, username: "some_user", content: "Bye", createdAt: "2021-01-01" },
         ];
-        this.setState({ chatMessages, chatRoom });
+
+        const username = await AsyncStorage.getItem("loggedInUsername")
+        console.log(username);
+
+        this.setState({ chatMessages, chatRoom, username });
     }
 
     componentDidUpdate(prevProps: any): void {
@@ -78,6 +89,15 @@ const styles = StyleSheet.create({
         backgroundColor: THEME_COLORS.CHAT_LIST_COLOR,
     },
     messageBox: {
+        padding: 10,
+        borderRadius: 20,
+        borderColor: THEME_COLORS.INACTIVE_SCREEN_TAB,
+        borderWidth: 1,
+        marginBottom: 10,
+        maxWidth: '80%',
+        alignSelf: 'flex-end',
+    },
+    messageFromOther: {
         padding: 10,
         borderRadius: 20,
         borderColor: THEME_COLORS.INACTIVE_SCREEN_TAB,

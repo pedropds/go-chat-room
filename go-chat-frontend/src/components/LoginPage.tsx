@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { THEME_COLORS } from '../Constants';
+import { API_URL, THEME_COLORS } from '../Constants';
+import axios from 'axios';
 
 interface LoginScreenProps {
     onLogin: () => void;
@@ -13,7 +14,18 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
 
     const handleLogin = async () => {
         try {
+            const response = await axios.post(API_URL + "user/login", {
+                username,
+                password,
+            });
+
+            const usernameResponse = response.data.username;
+            const token = response.data.token;
+
+            await AsyncStorage.setItem("loggedInUsername", usernameResponse);
+            await AsyncStorage.setItem("token", token);
             await AsyncStorage.setItem("isLoggedIn", "true");
+            
             onLogin();
         } catch (error) {
             console.log(error);
@@ -71,7 +83,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 5,
-        backgroundColor: '#161b33',
+        backgroundColor: THEME_COLORS.INACTIVE_SCREEN_TAB,
     },
     buttonText: {
         display: 'flex',

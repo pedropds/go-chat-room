@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from '@react-navigation/native';
-import React from "react";
+import React, { Component } from "react";
 import { Ionicons } from '@expo/vector-icons';
 
 
@@ -12,11 +12,16 @@ import OpenChat from "./OpenChat";
 
 const Tab = createBottomTabNavigator();
 
-export default class MainContainer extends React.Component {
+interface MainContainerProps {
+    onLogout: () => void;
+    //username: string;
+}
+
+export default class MainContainer extends Component<MainContainerProps, any> {
     render() {
         return (
             <NavigationContainer>
-                <Tab.Navigator 
+                <Tab.Navigator
                     initialRouteName="Chats"
                     screenOptions={({ route }) => ({
                         animationEnabled: true,
@@ -37,7 +42,14 @@ export default class MainContainer extends React.Component {
                         },
                     })}>
                     <Tab.Screen name="Chats" component={ChatList} />
-                    <Tab.Screen name="Settings" component={SettingsComp} />
+                    <Tab.Screen name="Settings">
+                        {props => (
+                            <SettingsComp
+                                {...props}
+                                onLogout={this.props.onLogout}
+                            />
+                        )}
+                    </Tab.Screen>
                     <Tab.Screen name="OpenChat" component={OpenChat}
                         options={{
                             tabBarButton: () => null

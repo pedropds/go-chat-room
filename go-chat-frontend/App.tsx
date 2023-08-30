@@ -14,13 +14,18 @@ export default function App() {
     setIsLoggedIn(true);
   };
 
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
+
   useEffect(() => {
     const checkAuthentication = async () => {
       try {
         const storedValue = await AsyncStorage.getItem('isLoggedIn');
         if (storedValue === 'true') {
-          setIsLoggedIn(false);
+          setIsLoggedIn(true);
         }
+
         setLoading(false);
       } catch (error) {
         // Handle error
@@ -36,7 +41,7 @@ export default function App() {
   return (
     <View style={{ flex: 1 }}>
       {isLoggedIn ? (
-        <MainContainer />
+        <MainContainer onLogout={handleLogout} />
       ) : (
         <LoginScreen onLogin={handleLogin} />
       )}
