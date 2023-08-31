@@ -3,8 +3,10 @@ import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native
 import axios from 'axios';
 import { FlatList } from 'react-native-gesture-handler';
 import LetterIcon from './icon/LettersIcon';
-import { THEME_COLORS } from '../Constants';
+import { API_URL, THEME_COLORS } from '../Constants';
 import { ChatRoomDTO } from '../model/chat.model';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import jwtDecode from 'jwt-decode';
 
 interface ChatListProps {
     navigation: any;
@@ -27,22 +29,29 @@ export default class ChatList extends Component<ChatListProps, ChatListState> {
 
     render() {
         const { fadeAnim } = this.state;
+
+        const isChatListEmpty = this.state.chatList.length === 0;
+
         return (
             <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-                <FlatList style={styles.chatList} data={this.state.chatList}
-                    renderItem={({ item, index }) => (
-                        <TouchableOpacity
-                            style={[
-                                styles.item,
-                                index === 0 && styles.firstItem,
-                            ]}
-                            onPress={() => this.handleItemPress(item)}
-                        >
-                            <LetterIcon initials={this.getInitials(item.roomName)} />
-                            <Text style={styles.text}>{item.roomName}</Text>
-                        </TouchableOpacity>
-                    )}
-                />
+                {isChatListEmpty ? (
+                    <Text style={{ color: THEME_COLORS.INITIALS_ROOM_COLOR }}>No chats present</Text>
+                ) : (
+                    <FlatList style={styles.chatList} data={this.state.chatList}
+                        renderItem={({ item, index }) => (
+                            <TouchableOpacity
+                                style={[
+                                    styles.item,
+                                    index === 0 && styles.firstItem,
+                                ]}
+                                onPress={() => this.handleItemPress(item)}
+                            >
+                                <LetterIcon initials={this.getInitials(item.roomName)} />
+                                <Text style={styles.text}>{item.roomName}</Text>
+                            </TouchableOpacity>
+                        )}
+                    />
+                )}
             </Animated.View>
         );
     }
@@ -58,34 +67,28 @@ export default class ChatList extends Component<ChatListProps, ChatListState> {
             useNativeDriver: true,
         }).start();
 
-        let chatList: ChatRoomDTO[] = [
-            { roomId: 1, roomName: "Room 1", createdAt: "2021-01-01", creatorId: 1 },
-            { roomId: 2, roomName: "Room 2", createdAt: "2021-01-01", creatorId: 1 },
-            { roomId: 3, roomName: "Room 3", createdAt: "2021-01-01", creatorId: 1 },
-            { roomId: 4, roomName: "Room 4", createdAt: "2021-01-01", creatorId: 1 },
-            { roomId: 5, roomName: "Room 5", createdAt: "2021-01-01", creatorId: 1 },
-            { roomId: 6, roomName: "Room 6", createdAt: "2021-01-01", creatorId: 1 },
-            { roomId: 7, roomName: "Room 7", createdAt: "2021-01-01", creatorId: 1 },
-            { roomId: 8, roomName: "Room 8", createdAt: "2021-01-01", creatorId: 1 },
-            { roomId: 9, roomName: "Room 9", createdAt: "2021-01-01", creatorId: 1 },
-            { roomId: 10, roomName: "Room 10", createdAt: "2021-01-01", creatorId: 1 },
-            { roomId: 11, roomName: "Room 11", createdAt: "2021-01-01", creatorId: 1 },
-            { roomId: 12, roomName: "Room 12", createdAt: "2021-01-01", creatorId: 1 },
-            { roomId: 13, roomName: "Room 13", createdAt: "2021-01-01", creatorId: 1 },
-        ];
-        this.setState({ chatList });
-        /*
-        axios.get('http://localhost:8080/chatroom/1')
+        this.loadChatList();
+    }
+
+    getInitials(str: string): string {
+        return str.substring(0, 2);
+    }
+
+    private async loadChatList() {
+        const jwtToken = await AsyncStorage.getItem("token");
+
+        if (jwtToken == null)
+            return;
+
+        const decodedToken: any = jwtDecode(jwtToken);
+        const userId = decodedToken.userId;
+
+        axios.get(`${API_URL}/chatroom/${userId}`)
             .then((response) => {
                 const chatList = response.data;
                 console.log(chatList);
                 this.setState({ chatList });
             });
-            */
-    }
-
-    getInitials(str: string): string {
-        return str.substring(0, 2);
     }
 
 }

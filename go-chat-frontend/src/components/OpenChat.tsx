@@ -1,16 +1,17 @@
 import React, { Component } from "react";
 import { ChatMessageDTO, ChatRoomDTO } from "../model/chat.model";
 import { FlatList, View, Text, Animated, StyleSheet } from "react-native";
-import { useIsFocused } from "@react-navigation/native";
-import { withNavigationFocus } from "react-navigation";
-import { THEME_COLORS } from "../Constants";
+import { API_URL, THEME_COLORS } from "../Constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { Appbar, DefaultTheme, Divider, Menu, PaperProvider } from "react-native-paper";
 
 
 interface OpenChatState {
     chatMessages: ChatMessageDTO[];
     chatRoom: ChatRoomDTO | null;
     username: string | null;
+    visible: boolean;
 }
 
 interface OpenChatProps {
@@ -26,49 +27,61 @@ export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
             chatMessages: [],
             chatRoom: null,
             username: null,
+            visible: false,
         };
     }
 
-    render() {
-        return (
-            <View style={[styles.container]}>
-                <FlatList data={this.state.chatMessages}
-                    renderItem={({ item, index }) => {
-                        const messageBoxStyle = item.username === this.state.username
-                            ? styles.messageFromOther
-                            : styles.messageBox;
+    _openMenu = () => this.setState({ visible: true });
+    _closeMenu = () => this.setState({ visible: false });
 
-                        return (
-                            <View style={[messageBoxStyle]}>
-                                <Text style={styles.messageText}>{item.content}</Text>
-                            </View>
-                        );
-                    }}
-                />
-            </View>
+    render() {
+        const chatTitle = this.state.chatRoom?.roomName ?? "Chat";
+
+        return (
+            <PaperProvider theme={DefaultTheme}>
+                <View style={[styles.container]}>
+                    <Appbar.Header style={styles.topBar}>
+                        <Appbar.Content titleStyle={styles.headerTitle} title={chatTitle} />
+                        <Menu
+                            visible={this.state.visible}
+                            onDismiss={this._closeMenu}
+                            anchor={
+                                <Appbar.Action
+                                    icon="dots-vertical"
+                                    onPress={this._openMenu}
+                                />
+                            }
+                        >
+                            <Menu.Item onPress={() => { /* Handle option 1 */ }} title="Option 1" />
+                            <Divider />
+                            <Menu.Item onPress={() => { /* Handle option 2 */ }} title="Option 2" />
+                        </Menu>
+                    </Appbar.Header>
+                    <FlatList data={this.state.chatMessages}
+                        renderItem={({ item, index }) => {
+                            const messageBoxStyle = item.username === this.state.username
+                                ? styles.messageFromMe
+                                : styles.messageFromOther;
+
+                            return (
+                                <View style={[messageBoxStyle]}>
+                                    <Text style={styles.messageText}>{item.content}</Text>
+                                </View>
+                            );
+                        }}
+                    />
+                </View>
+            </PaperProvider>
         );
     }
 
     async componentDidMount() {
         const chatRoom: ChatRoomDTO = this.props.route.params.chatRoom;
-        //TODO fetch real messages
-        const chatMessages: ChatMessageDTO[] = [
-            { messageId: 1, roomId: 1, userId: 1, username: "pedropds", content: "Hello", createdAt: "2021-01-01" },
-            { messageId: 2, roomId: 1, userId: 2, username: "some_user", content: "Hi", createdAt: "2021-01-01" },
-            { messageId: 3, roomId: 1, userId: 1, username: "pedropds", content: "How are you?", createdAt: "2021-01-01" },
-            { messageId: 4, roomId: 1, userId: 2, username: "some_user", content: "I'm fine, thanks", createdAt: "2021-01-01" },
-            { messageId: 5, roomId: 1, userId: 1, username: "pedropds", content: "Good to hear", createdAt: "2021-01-01" },
-            { messageId: 6, roomId: 1, userId: 2, username: "some_user", content: "How about you?", createdAt: "2021-01-01" },
-            { messageId: 7, roomId: 1, userId: 1, username: "pedropds", content: "I'm fine too", createdAt: "2021-01-01" },
-            { messageId: 8, roomId: 1, userId: 2, username: "some_user", content: "Good to hear", createdAt: "2021-01-01" },
-            { messageId: 9, roomId: 1, userId: 1, username: "pedropds", content: "Bye", createdAt: "2021-01-01" },
-            { messageId: 10, roomId: 1, userId: 2, username: "some_user", content: "Bye", createdAt: "2021-01-01" },
-        ];
 
         const username = await AsyncStorage.getItem("loggedInUsername")
-        console.log(username);
+        this.setState({ chatRoom, username });
 
-        this.setState({ chatMessages, chatRoom, username });
+        this.loadChatMessages(chatRoom.roomId);
     }
 
     componentDidUpdate(prevProps: any): void {
@@ -77,8 +90,15 @@ export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
         if (prevProps.route.params.chatRoom.roomId === chatRoom.roomId)
             return;
 
-        //TODO fetch new messages
-        console.log(this.props.route.params.chatRoom);
+        this.loadChatMessages(chatRoom.roomId);
+    }
+
+    private async loadChatMessages(chatRoomId: number) {
+        axios.get(`${API_URL}/message/${chatRoomId}`)
+            .then((response) => {
+                const chatMessages = response.data;
+                this.setState({ chatMessages });
+            });
     }
 
 }
@@ -86,9 +106,17 @@ export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        color: THEME_COLORS.BACKGROUND_MENU_COLOR,
         backgroundColor: THEME_COLORS.CHAT_LIST_COLOR,
     },
-    messageBox: {
+    topBar: {
+        flexDirection: 'row',
+        backgroundColor: THEME_COLORS.BACKGROUND_MENU_COLOR,
+    },
+    headerTitle: {
+        color: THEME_COLORS.ACTIVE_SCREEN_TAB,
+    },
+    messageFromMe: {
         padding: 10,
         borderRadius: 20,
         borderColor: THEME_COLORS.INACTIVE_SCREEN_TAB,

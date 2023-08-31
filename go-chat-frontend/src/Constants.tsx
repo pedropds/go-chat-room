@@ -7,4 +7,4 @@ export const THEME_COLORS = {
     TEXT_ROOM_COLOR: '#bcccdc',
 }
 
-export const API_URL = 'http://localhost:8080/';
+export const API_URL = 'http://localhost:8080';
