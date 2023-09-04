@@ -52,7 +52,8 @@ export default class MainContainer extends Component<MainContainerProps, any> {
                     </Tab.Screen>
                     <Tab.Screen name="OpenChat" component={OpenChat}
                         options={{
-                            tabBarButton: () => null
+                            tabBarButton: () => null,
+                            tabBarStyle: { display: 'none' },
                         }}
                     />
                 </Tab.Navigator>
