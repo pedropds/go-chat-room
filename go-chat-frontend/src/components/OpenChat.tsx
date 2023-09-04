@@ -4,7 +4,10 @@ import { FlatList, View, Text, Animated, StyleSheet } from "react-native";
 import { API_URL, THEME_COLORS } from "../Constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { Appbar, DefaultTheme, Divider, Menu, PaperProvider } from "react-native-paper";
+import { DefaultTheme, Menu, PaperProvider } from "react-native-paper";
+import OpenChatHeader from "./OpenChatHeader";
+import { HttpService } from "../service/http-service";
+import OpenChatSendMessage from "./OpenChatSendMessage";
 
 
 interface OpenChatState {
@@ -35,29 +38,11 @@ export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
     _closeMenu = () => this.setState({ visible: false });
 
     render() {
-        const chatTitle = this.state.chatRoom?.roomName ?? "Chat";
-
         return (
             <PaperProvider theme={DefaultTheme}>
                 <View style={[styles.container]}>
-                    <Appbar.Header style={styles.topBar}>
-                        <Appbar.Content titleStyle={styles.headerTitle} title={chatTitle} />
-                        <Menu
-                            visible={this.state.visible}
-                            onDismiss={this._closeMenu}
-                            anchor={
-                                <Appbar.Action
-                                    icon="dots-vertical"
-                                    onPress={this._openMenu}
-                                />
-                            }
-                        >
-                            <Menu.Item onPress={() => { /* Handle option 1 */ }} title="Option 1" />
-                            <Divider />
-                            <Menu.Item onPress={() => { /* Handle option 2 */ }} title="Option 2" />
-                        </Menu>
-                    </Appbar.Header>
-                    <FlatList data={this.state.chatMessages}
+                    <OpenChatHeader chatRoom={this.state.chatRoom} navigation={this.props.navigation} />
+                    <FlatList style={styles.list} data={this.state.chatMessages}
                         renderItem={({ item, index }) => {
                             const messageBoxStyle = item.username === this.state.username
                                 ? styles.messageFromMe
@@ -70,6 +55,7 @@ export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
                             );
                         }}
                     />
+                    <OpenChatSendMessage onSend={this.handleSendMessage} />
                 </View>
             </PaperProvider>
         );
@@ -94,12 +80,18 @@ export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
     }
 
     private async loadChatMessages(chatRoomId: number) {
-        axios.get(`${API_URL}/message/${chatRoomId}`)
+        const url = `${API_URL}/message/${chatRoomId}`;
+
+        HttpService.get(url, {})
             .then((response) => {
                 const chatMessages = response.data;
                 this.setState({ chatMessages });
             });
     }
+
+    private handleSendMessage = (text: string) => {
+        console.log(text);
+    };
 
 }
 
@@ -109,12 +101,8 @@ const styles = StyleSheet.create({
         color: THEME_COLORS.BACKGROUND_MENU_COLOR,
         backgroundColor: THEME_COLORS.CHAT_LIST_COLOR,
     },
-    topBar: {
-        flexDirection: 'row',
-        backgroundColor: THEME_COLORS.BACKGROUND_MENU_COLOR,
-    },
-    headerTitle: {
-        color: THEME_COLORS.ACTIVE_SCREEN_TAB,
+    list: {
+        paddingTop: 10,
     },
     messageFromMe: {
         padding: 10,
