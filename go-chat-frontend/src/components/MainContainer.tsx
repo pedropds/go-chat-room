@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import ChatList from "./ChatListSelection";
 import SettingsComp from "./Settings";
 import { THEME_COLORS } from "../Constants";
-import OpenChat from "./OpenChat";
+import OpenChat from "./open-chat/OpenChat";
 
 
 const Tab = createBottomTabNavigator();
