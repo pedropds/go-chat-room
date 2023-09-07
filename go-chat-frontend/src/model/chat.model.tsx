@@ -6,10 +6,10 @@ export interface ChatRoomDTO {
 }
 
 export interface ChatMessageDTO {
-    messageId: number;
+    messageId?: number;
     roomId: number;
-    userId: number;
+    userId?: number;
     username: string;
     content: string;
-    createdAt: string;
+    createdAt?: string;
 }

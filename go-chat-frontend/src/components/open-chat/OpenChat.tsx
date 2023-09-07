@@ -1,9 +1,8 @@
 import React, { Component } from "react";
 import { ChatMessageDTO, ChatRoomDTO } from "../../model/chat.model";
 import { FlatList, View, Text, Animated, StyleSheet } from "react-native";
-import { API_URL, THEME_COLORS } from "../../Constants";
+import { API_URL, THEME_COLORS, WS_URL } from "../../Constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
 import { DefaultTheme, Menu, PaperProvider } from "react-native-paper";
 import OpenChatHeader from "./OpenChatHeader";
 import { HttpService } from "../../service/http-service";
@@ -32,6 +31,7 @@ export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
             username: null,
             visible: false,
         };
+        
     }
 
     _openMenu = () => this.setState({ visible: true });
@@ -41,7 +41,7 @@ export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
         return (
             <PaperProvider theme={DefaultTheme}>
                 <View style={[styles.container]}>
-                    <OpenChatHeader chatRoom={this.state.chatRoom} navigation={this.props.navigation} />
+                    <OpenChatHeader onBackButtonPress={this.handleBackButtonPress} chatRoom={this.state.chatRoom} navigation={this.props.navigation} />
                     <FlatList style={styles.list} data={this.state.chatMessages}
                         renderItem={({ item, index }) => {
                             const messageBoxStyle = item.username === this.state.username
@@ -71,9 +71,10 @@ export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
     }
 
     componentDidUpdate(prevProps: any): void {
+        console.log("componentDidUpdate");
         const chatRoom: ChatRoomDTO = this.props.route.params.chatRoom;
 
-        if (prevProps.route.params.chatRoom.roomId === chatRoom.roomId)
+        if (prevProps.route.params.chatRoom.roomId === chatRoom.roomId && HttpService.isWebSocketConnected())
             return;
 
         this.loadChatMessages(chatRoom.roomId);
@@ -87,10 +88,33 @@ export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
                 const chatMessages = response.data;
                 this.setState({ chatMessages });
             });
+
+        HttpService.connectWebSocket(`${WS_URL}/chat-connect/${chatRoomId}`);
+
+        this.listenToWebSocketEvents();
     }
 
+    private listenToWebSocketEvents(): void {
+        HttpService.onWebSocketMessage((message) => {
+            const chatMessage = JSON.parse(message.data);
+            this.setState((prevState) => ({
+                chatMessages: [...prevState.chatMessages, chatMessage],
+            }));
+        });
+    }
+    
     private handleSendMessage = (text: string) => {
-        console.log(text);
+        const chatMessage: ChatMessageDTO = {
+            content: text,
+            username: this.state.username ?? "",
+            roomId: this.state.chatRoom?.roomId ?? 0,
+        };
+
+        HttpService.sendWebSocketMessage(JSON.stringify(chatMessage));
+    };
+
+    private handleBackButtonPress = () => {
+        HttpService.disconnectWebSocket();
     };
 
 }

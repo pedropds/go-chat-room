@@ -7,6 +7,7 @@ import { THEME_COLORS } from "../../Constants";
 interface OpenChatHeaderProps {
     navigation: any;
     chatRoom: ChatRoomDTO | null;
+    onBackButtonPress: () => void;
 }
 
 export default class OpenChatHeader extends Component<OpenChatHeaderProps, any> {
@@ -51,6 +52,7 @@ export default class OpenChatHeader extends Component<OpenChatHeaderProps, any> 
     }
 
     private handleBackButtonPress = () => {
+        this.props.onBackButtonPress();
         const { navigation } = this.props;
         navigation.goBack();
     };
