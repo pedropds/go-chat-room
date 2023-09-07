@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 	"go-chat-backend/model"
 	"log"
+	"net/http"
 	"sync"
 )
 
@@ -25,6 +26,10 @@ type WebSocketServiceImpl struct {
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		//see if origin is allowed
+		return true
+	},
 }
 
 func (wsImpl *WebSocketServiceImpl) OpenWebSocketConnection(c *gin.Context, chatRoomId int64) {
@@ -51,14 +56,14 @@ func (wsImpl *WebSocketServiceImpl) reader(conn *websocket.Conn, chatRoomId int6
 			break
 		}
 
-		message := &model.Message{}
+		message := &model.MessageResponse{}
 		err = json.Unmarshal(p, message)
 		if err != nil {
 			log.Println(err)
 			panic("Error unmarshalling message! Error: " + err.Error())
 		}
 
-		messageResponse := wsImpl.MessageService.CreateMessage(*message)
+		messageResponse := wsImpl.MessageService.CreateMessageWithUsername(*message)
 		messageResponseBytes, errorMarshal := json.Marshal(messageResponse)
 		if errorMarshal != nil {
 			log.Println(errorMarshal)
