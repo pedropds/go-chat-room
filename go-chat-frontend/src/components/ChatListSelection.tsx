@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import axios from 'axios';
 import { FlatList } from 'react-native-gesture-handler';
 import LetterIcon from './icon/LettersIcon';
 import { API_URL, THEME_COLORS } from '../Constants';
 import { ChatRoomDTO } from '../model/chat.model';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import jwtDecode from 'jwt-decode';
+import { HttpService } from '../service/http-service';
+import CreateNewChat from './open-chat/CreateNewChat';
 
 interface ChatListProps {
     navigation: any;
@@ -52,6 +53,9 @@ export default class ChatList extends Component<ChatListProps, ChatListState> {
                         )}
                     />
                 )}
+                <View style={styles.createChat}>
+                    <CreateNewChat />
+                </View>
             </Animated.View>
         );
     }
@@ -83,14 +87,15 @@ export default class ChatList extends Component<ChatListProps, ChatListState> {
         const decodedToken: any = jwtDecode(jwtToken);
         const userId = decodedToken.userId;
 
-        axios.get(`${API_URL}/chatroom/${userId}`)
-            .then((response) => {
+        const url = `${API_URL}/chatroom/${userId}`;
+
+        HttpService.get(url, {})
+            .subscribe((response) => {
                 const chatList = response.data;
                 console.log(chatList);
                 this.setState({ chatList });
             });
     }
-
 }
 
 const styles = StyleSheet.create({
@@ -117,6 +122,9 @@ const styles = StyleSheet.create({
         alignContent: 'center',
         paddingLeft: 10,
         color: THEME_COLORS.INITIALS_ROOM_COLOR,
+    },
+    createChat: {
+        marginLeft: 'auto',
     },
     firstItem: {
         borderTopWidth: 0,

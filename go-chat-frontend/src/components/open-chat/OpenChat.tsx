@@ -84,7 +84,7 @@ export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
         const url = `${API_URL}/message/${chatRoomId}`;
 
         HttpService.get(url, {})
-            .then((response) => {
+            .subscribe((response) => {
                 const chatMessages = response.data;
                 this.setState({ chatMessages });
             });
