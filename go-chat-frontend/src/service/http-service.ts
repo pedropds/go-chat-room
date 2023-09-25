@@ -1,16 +1,17 @@
 import axios from 'axios';
+import { Observable, from } from 'rxjs'
 
 export class HttpService {
 
     private static messageListeners: ((message: MessageEvent) => void)[] = [];
     private static socket: WebSocket | null = null;
 
-    static get(url: string, params: any): Promise<any> {
-        return axios.get(url, { params });
+    static get(url: string, params: any): Observable<any> {
+        return from(axios.get(url, { params }));
     }
 
-    static post(url: string, data: any): Promise<any> {
-        return axios.post(url, data);
+    static post(url: string, data: any): Observable<any> {
+        return from(axios.post(url, data));
     }
 
     static isWebSocketConnected(): boolean {
