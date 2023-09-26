@@ -1,8 +1,29 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import {
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalFooter,
+    ModalBody,
+    ModalCloseButton,
+    Button,
+} from '@chakra-ui/react';
 
+interface CreateNewChatState {
+    isOpen: boolean;
+}
 
-export default class CreateNewChat extends Component {
+export default class CreateNewChat extends Component<any, CreateNewChatState> {
+
+    constructor(props: any) {
+        super(props);
+        this.state = {
+            isOpen: false,
+        };
+    }
+
     render() {
         return (
             <View style={styles.button}>
@@ -12,15 +33,35 @@ export default class CreateNewChat extends Component {
                 >
                     <Text style={styles.addButtonText}>+</Text>
                 </TouchableOpacity>
+                <Modal isOpen={this.state.isOpen} onClose={this.onClose}>
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader>Create new chat</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody>
+                            what is happening
+                        </ModalBody>
+
+                        <ModalFooter>
+                            <Button colorScheme='blue' mr={3} onClick={this.onClose}>
+                                Close
+                            </Button>
+                            <Button variant='ghost'>Secondary Action</Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
             </View>
         )
     }
 
     handleAddChatRoomPress() {
-        console.log("handle press");
+        this.setState({ isOpen: true });
+    }
+
+    onClose = () => {
+        this.setState({ isOpen: false });
     }
 }
-
 
 const styles = StyleSheet.create({
     button: {
