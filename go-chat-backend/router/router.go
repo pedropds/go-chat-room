@@ -1,13 +1,14 @@
 package router
 
 import (
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 	"go-chat-backend/controller"
 	"go-chat-backend/model"
 	"go-chat-backend/service"
-	"gorm.io/gorm"
 	"sync"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func Init(db *gorm.DB) *gin.Engine {
