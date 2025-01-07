@@ -1,128 +1,108 @@
-import React, { Component } from "react";
-import { ChatMessageDTO, ChatRoomDTO } from "../../model/chat.model";
-import { FlatList, View, Text, Animated, StyleSheet } from "react-native";
-import { API_URL, THEME_COLORS, WS_URL } from "../../Constants";
+import React, { useEffect, useState, useCallback } from "react";
+import { FlatList, View, Text, StyleSheet } from "react-native";
+import { PaperProvider, DefaultTheme } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { DefaultTheme, Menu, PaperProvider } from "react-native-paper";
+import { API_URL, THEME_COLORS, WS_URL } from "../../Constants";
+import { ChatMessageDTO, ChatRoomDTO } from "../../model/chat.model";
 import OpenChatHeader from "./OpenChatHeader";
-import { HttpService } from "../../service/http-service";
 import OpenChatSendMessage from "./OpenChatSendMessage";
-
-interface OpenChatState {
-  chatMessages: ChatMessageDTO[];
-  chatRoom: ChatRoomDTO | null;
-  username: string | null;
-  visible: boolean;
-}
+import { HttpService } from "../../service/http-service";
 
 interface OpenChatProps {
   navigation: any;
   route: any;
 }
 
-export default class OpenChat extends Component<OpenChatProps, OpenChatState> {
-  constructor(props: any) {
-    super(props);
-    this.state = {
-      chatMessages: [],
-      chatRoom: null,
-      username: null,
-      visible: false,
-    };
-  }
+const OpenChat = ({ navigation, route }: OpenChatProps) => {
+  const [chatMessages, setChatMessages] = useState<ChatMessageDTO[]>([]);
+  const [chatRoom, setChatRoom] = useState<ChatRoomDTO | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
+  const [visible, setVisible] = useState(false);
 
-  _openMenu = () => this.setState({ visible: true });
-  _closeMenu = () => this.setState({ visible: false });
+  const openMenu = useCallback(() => setVisible(true), []);
+  const closeMenu = useCallback(() => setVisible(false), []);
 
-  render() {
-    return (
-      <PaperProvider theme={DefaultTheme}>
-        <View style={[styles.container]}>
-          <OpenChatHeader
-            onBackButtonPress={this.handleBackButtonPress}
-            chatRoom={this.state.chatRoom}
-            navigation={this.props.navigation}
-          />
-          <FlatList
-            style={styles.list}
-            data={this.state.chatMessages}
-            renderItem={({ item, index }) => {
-              const messageBoxStyle =
-                item.username === this.state.username
-                  ? styles.messageFromMe
-                  : styles.messageFromOther;
-
-              return (
-                <View style={[messageBoxStyle]}>
-                  <Text style={styles.messageText}>{item.content}</Text>
-                </View>
-              );
-            }}
-          />
-          <OpenChatSendMessage onSend={this.handleSendMessage} />
-        </View>
-      </PaperProvider>
-    );
-  }
-
-  async componentDidMount() {
-    const chatRoom: ChatRoomDTO = this.props.route.params.chatRoom;
-
-    const username = await AsyncStorage.getItem("loggedInUsername");
-    this.setState({ chatRoom, username });
-
-    this.loadChatMessages(chatRoom.roomId);
-  }
-
-  componentDidUpdate(prevProps: any): void {
-    console.log("componentDidUpdate");
-    const chatRoom: ChatRoomDTO = this.props.route.params.chatRoom;
-
-    if (
-      prevProps.route.params.chatRoom.roomId === chatRoom.roomId &&
-      HttpService.isWebSocketConnected()
-    )
-      return;
-
-    this.loadChatMessages(chatRoom.roomId);
-  }
-
-  private async loadChatMessages(chatRoomId: number) {
+  const loadChatMessages = useCallback(async (chatRoomId: number) => {
     const url = `${API_URL}/message/${chatRoomId}`;
 
-    HttpService.get(url, {}).subscribe((response) => {
-      const chatMessages = response.data;
-      this.setState({ chatMessages });
+    HttpService.get(url, {}).subscribe((response: { data: any }) => {
+      const messages = response.data;
+      setChatMessages(messages);
     });
 
     HttpService.connectWebSocket(`${WS_URL}/chat-connect/${chatRoomId}`);
 
-    this.listenToWebSocketEvents();
-  }
-
-  private listenToWebSocketEvents(): void {
-    HttpService.onWebSocketMessage((message) => {
+    HttpService.onWebSocketMessage((message: any) => {
       const chatMessage = JSON.parse(message.data);
-      this.setState((prevState) => ({
-        chatMessages: [...prevState.chatMessages, chatMessage],
-      }));
+      setChatMessages((prevMessages) => [...prevMessages, chatMessage]);
     });
-  }
+  }, []);
 
-  private handleSendMessage = (text: string) => {
-    const chatMessage: ChatMessageDTO = {
-      content: text,
-      username: this.state.username ?? "",
-      roomId: this.state.chatRoom?.roomId ?? 0,
+  useEffect(() => {
+    (async () => {
+      const room: ChatRoomDTO = route.params.chatRoom;
+      const user = await AsyncStorage.getItem("loggedInUsername");
+
+      setChatRoom(room);
+      setUsername(user);
+      loadChatMessages(room.roomId);
+    })();
+
+    return () => {
+      HttpService.disconnectWebSocket();
     };
+  }, [route.params.chatRoom, loadChatMessages]);
 
-    HttpService.sendWebSocketMessage(JSON.stringify(chatMessage));
-  };
+  const handleSendMessage = useCallback(
+    (text: string) => {
+      if (!chatRoom || !username) return;
 
-  private handleBackButtonPress = () => {
+      const chatMessage: ChatMessageDTO = {
+        content: text,
+        username,
+        roomId: chatRoom.roomId,
+      };
+
+      HttpService.sendWebSocketMessage(JSON.stringify(chatMessage));
+    },
+    [chatRoom, username]
+  );
+
+  const handleBackButtonPress = useCallback(() => {
     HttpService.disconnectWebSocket();
-  };
-}
+    navigation.goBack();
+  }, [navigation]);
+
+  return (
+    <PaperProvider theme={DefaultTheme}>
+      <View style={[styles.container]}>
+        <OpenChatHeader
+          onBackButtonPress={handleBackButtonPress}
+          chatRoom={chatRoom}
+          navigation={navigation}
+        />
+        <FlatList
+          style={styles.list}
+          data={chatMessages}
+          keyExtractor={(item, index) => `${item.roomId}-${index}`}
+          renderItem={({ item }) => {
+            const messageBoxStyle =
+              item.username === username
+                ? styles.messageFromMe
+                : styles.messageFromOther;
+
+            return (
+              <View style={[messageBoxStyle]}>
+                <Text style={styles.messageText}>{item.content}</Text>
+              </View>
+            );
+          }}
+        />
+        <OpenChatSendMessage onSend={handleSendMessage} />
+      </View>
+    </PaperProvider>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -160,3 +140,5 @@ const styles = StyleSheet.create({
     color: THEME_COLORS.ACTIVE_SCREEN_TAB,
   },
 });
+
+export default OpenChat;

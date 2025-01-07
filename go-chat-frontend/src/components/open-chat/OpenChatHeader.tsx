@@ -1,71 +1,59 @@
-import { Component } from "react";
+import React, { useState, useCallback } from "react";
 import { StyleSheet } from "react-native";
 import { Appbar, Menu } from "react-native-paper";
 import { ChatRoomDTO } from "../../model/chat.model";
 import { THEME_COLORS } from "../../Constants";
 
 interface OpenChatHeaderProps {
-    navigation: any;
-    chatRoom: ChatRoomDTO | null;
-    onBackButtonPress: () => void;
+  navigation: any;
+  chatRoom: ChatRoomDTO | null;
+  onBackButtonPress: () => void;
 }
 
-export default class OpenChatHeader extends Component<OpenChatHeaderProps, any> {
+const OpenChatHeader = ({
+  navigation,
+  chatRoom,
+  onBackButtonPress,
+}: OpenChatHeaderProps) => {
+  const [visible, setVisible] = useState(false);
 
-    constructor(props: any) {
-        super(props);
-        this.state = {
-            chatRoom: null,
-            visible: false,
-        };
-    }
+  const openMenu = useCallback(() => setVisible(true), []);
+  const closeMenu = useCallback(() => setVisible(false), []);
 
-    _openMenu = () => this.setState({ visible: true });
-    _closeMenu = () => this.setState({ visible: false });
+  const handleViewMembersOption = useCallback(() => {
+    console.log("View members");
+  }, []);
 
-    render() {
-        const { chatRoom } = this.props;
-        const chatTitle = chatRoom?.roomName ?? "Chat";
+  const handleBackButtonPress = useCallback(() => {
+    onBackButtonPress();
+    navigation.goBack();
+  }, [onBackButtonPress, navigation]);
 
-        return (
-            <Appbar.Header style={styles.topBar}>
-                <Appbar.BackAction onPress={this.handleBackButtonPress} />
-                <Appbar.Content titleStyle={styles.headerTitle} title={chatTitle} />
-                <Menu
-                    visible={this.state.visible}
-                    onDismiss={this._closeMenu}
-                    anchor={
-                        <Appbar.Action
-                            icon="dots-vertical"
-                            onPress={this._openMenu}
-                        />
-                    }
-                >
-                    <Menu.Item onPress={() => { this.handleViewMembersOption() }} title="View members" />
-                </Menu>
-            </Appbar.Header>
-        );
-    }
+  const chatTitle = chatRoom?.roomName ?? "Chat";
 
-    private handleViewMembersOption() {
-        console.log("View members");
-    }
-
-    private handleBackButtonPress = () => {
-        this.props.onBackButtonPress();
-        const { navigation } = this.props;
-        navigation.goBack();
-    };
-
-}
-
+  return (
+    <Appbar.Header style={styles.topBar}>
+      <Appbar.BackAction onPress={handleBackButtonPress} />
+      <Appbar.Content titleStyle={styles.headerTitle} title={chatTitle} />
+      <Menu
+        visible={visible}
+        onDismiss={closeMenu}
+        anchor={<Appbar.Action icon="dots-vertical" onPress={openMenu} />}
+      >
+        <Menu.Item onPress={handleViewMembersOption} title="View members" />
+      </Menu>
+    </Appbar.Header>
+  );
+};
 
 const styles = StyleSheet.create({
-    topBar: {
-        flexDirection: 'row',
-        backgroundColor: THEME_COLORS.BACKGROUND_MENU_COLOR,
-    },
-    headerTitle: {
-        color: THEME_COLORS.ACTIVE_SCREEN_TAB,
-    }
+  topBar: {
+    flexDirection: "row",
+    backgroundColor: THEME_COLORS.BACKGROUND_MENU_COLOR,
+  },
+  headerTitle: {
+    color: THEME_COLORS.ACTIVE_SCREEN_TAB,
+  },
 });
+
+export default OpenChatHeader;

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import ReusableChatModal from "./ReusableChatModal";
 
-const CreateNewChat: React.FC = () => {
+const CreateNewChat = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const friends = [

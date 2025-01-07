@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Animated,
   StyleSheet,
@@ -19,75 +19,24 @@ interface ChatListProps {
   navigation: any;
 }
 
-interface ChatListState {
-  chatList: ChatRoomDTO[];
-  fadeAnim: Animated.Value;
-}
+const ChatList = ({ navigation }: ChatListProps) => {
+  const [chatList, setChatList] = useState<ChatRoomDTO[]>([]);
+  const fadeAnim = useState(new Animated.Value(0))[0];
 
-export default class ChatList extends Component<ChatListProps, ChatListState> {
-  constructor(props: any) {
-    super(props);
-    this.state = {
-      chatList: [],
-      fadeAnim: new Animated.Value(0),
-    };
-  }
-
-  render() {
-    const { fadeAnim } = this.state;
-
-    const isChatListEmpty = this.state.chatList.length === 0;
-
-    return (
-      <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-        {isChatListEmpty ? (
-          <Text style={{ color: THEME_COLORS.INITIALS_ROOM_COLOR }}>
-            No chats present
-          </Text>
-        ) : (
-          <FlatList
-            style={styles.chatList}
-            data={this.state.chatList}
-            renderItem={({ item, index }) => (
-              <TouchableOpacity
-                style={[styles.item, index === 0 && styles.firstItem]}
-                onPress={() => this.handleItemPress(item)}
-              >
-                <LetterIcon initials={this.getInitials(item.roomName)} />
-                <Text style={styles.text}>{item.roomName}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        )}
-        <View style={styles.createChat}>
-          <CreateNewChat />
-        </View>
-      </Animated.View>
-    );
-  }
-
-  handleItemPress(item: ChatRoomDTO) {
-    this.props.navigation.navigate("OpenChat", { chatRoom: item });
-  }
-
-  componentDidMount() {
-    Animated.timing(this.state.fadeAnim, {
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 250,
       useNativeDriver: true,
     }).start();
 
-    this.loadChatList();
-  }
+    loadChatList();
+  }, []);
 
-  getInitials(str: string): string {
-    return str.substring(0, 2);
-  }
-
-  private async loadChatList() {
+  const loadChatList = async () => {
     const jwtToken = await AsyncStorage.getItem("token");
 
-    if (jwtToken == null) return;
+    if (!jwtToken) return;
 
     const decodedToken: any = jwtDecode(jwtToken);
     const userId = decodedToken.userId;
@@ -97,10 +46,45 @@ export default class ChatList extends Component<ChatListProps, ChatListState> {
     HttpService.get(url, {}).subscribe((response) => {
       const chatList = response.data;
       console.log(chatList);
-      this.setState({ chatList });
+      setChatList(chatList);
     });
-  }
-}
+  };
+
+  const getInitials = (str: string): string => str.substring(0, 2);
+
+  const handleItemPress = (item: ChatRoomDTO) => {
+    navigation.navigate("OpenChat", { chatRoom: item });
+  };
+
+  const isChatListEmpty = chatList.length === 0;
+
+  return (
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+      {isChatListEmpty ? (
+        <Text style={{ color: THEME_COLORS.INITIALS_ROOM_COLOR }}>
+          No chats present
+        </Text>
+      ) : (
+        <FlatList
+          style={styles.chatList}
+          data={chatList}
+          renderItem={({ item, index }) => (
+            <TouchableOpacity
+              style={[styles.item, index === 0 && styles.firstItem]}
+              onPress={() => handleItemPress(item)}
+            >
+              <LetterIcon initials={getInitials(item.roomName)} />
+              <Text style={styles.text}>{item.roomName}</Text>
+            </TouchableOpacity>
+          )}
+        />
+      )}
+      <View style={styles.createChat}>
+        <CreateNewChat />
+      </View>
+    </Animated.View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -136,3 +120,5 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
   },
 });
+
+export default ChatList;

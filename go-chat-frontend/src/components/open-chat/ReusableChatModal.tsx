@@ -53,7 +53,7 @@ const ReusableChatModal: React.FC<ReusableChatModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent maxW="80%">
         <ModalHeader>{title}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
