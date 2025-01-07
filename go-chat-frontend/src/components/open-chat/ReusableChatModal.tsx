@@ -26,7 +26,7 @@ interface ReusableChatModalProps {
   allowChatName?: boolean; // Show/hide chat name input
 }
 
-const ReusableChatModal: React.FC<ReusableChatModalProps> = ({
+const ReusableChatModal = ({
   isOpen,
   onClose,
   onSubmit,
@@ -36,7 +36,7 @@ const ReusableChatModal: React.FC<ReusableChatModalProps> = ({
   placeholderText = "Select members...",
   friends,
   allowChatName = true,
-}) => {
+}: ReusableChatModalProps) => {
   const [chatName, setChatName] = useState(initialChatName);
   const [selectedMembers, setSelectedMembers] = useState<string[]>(
     initialSelectedMembers

@@ -25,10 +25,12 @@ func (r *MessageRepositoryImpl) GetAllMessagesForRoom(roomId int64) []MessageRes
 		Select("message.message_id, message.room_id, message.user_id, message.content, message.created_at, appuser.username").
 		Joins("left join appuser on message.user_id = appuser.user_id").
 		Where("room_id = ?", roomId).
+		Order("message.created_at ASC").
 		Find(&messages)
 
 	return messages
 }
+
 
 func (r *MessageRepositoryImpl) CreateMessageWithUserId(message Message) MessageResponse {
 	// Create the message record in the database.
