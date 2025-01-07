@@ -1,64 +1,41 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  Button,
-} from "@chakra-ui/react";
+import ReusableChatModal from "./ReusableChatModal";
 
-interface CreateNewChatState {
-  isOpen: boolean;
-}
+const CreateNewChat: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-export default class CreateNewChat extends Component<any, CreateNewChatState> {
-  constructor(props: any) {
-    super(props);
-    this.state = {
-      isOpen: false,
-    };
-  }
+  const friends = [
+    { label: "Alice", value: "Alice" },
+    { label: "Bob", value: "Bob" },
+    { label: "Charlie", value: "Charlie" },
+    { label: "Diana", value: "Diana" },
+    { label: "Eve", value: "Eve" },
+  ];
 
-  render() {
-    return (
-      <View style={styles.button}>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => this.handleAddChatRoomPress()}
-        >
-          <Text style={styles.addButtonText}>+</Text>
-        </TouchableOpacity>
-        <Modal isOpen={this.state.isOpen} onClose={this.onClose}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Create new chat</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>what is happening</ModalBody>
-
-            <ModalFooter>
-              <Button colorScheme="blue" mr={3} onClick={this.onClose}>
-                Close
-              </Button>
-              <Button variant="ghost">Secondary Action</Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      </View>
-    );
-  }
-
-  handleAddChatRoomPress() {
-    this.setState({ isOpen: true });
-  }
-
-  onClose = () => {
-    this.setState({ isOpen: false });
+  const handleCreateChat = (data: { chatName?: string; members: string[] }) => {
+    console.log("New Chat Created:", data);
   };
-}
+
+  return (
+    <View style={styles.button}>
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => setIsModalOpen(true)}
+      >
+        <Text style={styles.addButtonText}>+</Text>
+      </TouchableOpacity>
+      <ReusableChatModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleCreateChat}
+        title="Create New Chat"
+        friends={friends}
+        allowChatName={true}
+      />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   button: {
@@ -83,3 +60,5 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
 });
+
+export default CreateNewChat;
