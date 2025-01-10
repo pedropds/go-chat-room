@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     maxWidth: "80%",
     alignSelf: "flex-start",
-    backgroundColor: "blue",
+    backgroundColor: "lightseagreen",
   },
   messageText: {
     fontSize: 16,

@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 import { Appbar, Menu } from "react-native-paper";
 import { ChatRoomDTO } from "../../model/chat.model";
 import { THEME_COLORS } from "../../Constants";
+import { white } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 
 interface OpenChatHeaderProps {
   navigation: any;
@@ -33,7 +34,7 @@ const OpenChatHeader = ({
 
   return (
     <Appbar.Header style={styles.topBar}>
-      <Appbar.BackAction onPress={handleBackButtonPress} />
+      <Appbar.BackAction onPress={handleBackButtonPress} color="white" />
       <Appbar.Content titleStyle={styles.headerTitle} title={chatTitle} />
       <Menu
         visible={visible}
