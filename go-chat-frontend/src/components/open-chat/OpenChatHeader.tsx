@@ -39,7 +39,13 @@ const OpenChatHeader = ({
       <Menu
         visible={visible}
         onDismiss={closeMenu}
-        anchor={<Appbar.Action icon="dots-vertical" onPress={openMenu} />}
+        anchor={
+          <Appbar.Action
+            icon="dots-vertical"
+            onPress={openMenu}
+            color="white"
+          />
+        }
       >
         <Menu.Item onPress={handleViewMembersOption} title="View members" />
       </Menu>
@@ -54,6 +60,9 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: THEME_COLORS.ACTIVE_SCREEN_TAB,
+  },
+  menu: {
+    color: "white",
   },
 });
 
