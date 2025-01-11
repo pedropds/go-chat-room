@@ -26,11 +26,13 @@ const LoginScreen = ({ onLogin }: LoginScreenProps) => {
         password,
       });
 
+      const userId = response.data.userId;
       const usernameResponse = response.data.username;
       const token = response.data.token;
 
       await AsyncStorage.setItem("loggedInUsername", usernameResponse);
       await AsyncStorage.setItem("token", token);
+      await AsyncStorage.setItem("userId", userId);
       await AsyncStorage.setItem("isLoggedIn", "true");
 
       onLogin();

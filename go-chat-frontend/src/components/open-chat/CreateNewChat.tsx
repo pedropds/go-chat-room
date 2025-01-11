@@ -1,20 +1,44 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import ReusableChatModal from "./ReusableChatModal";
+import { HttpService } from "../../service/http-service";
+import { API_URL } from "../../Constants";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+export interface Member {
+  id: number;
+  label: string;
+  value: string;
+}
 
 const CreateNewChat = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const friends = [
-    { label: "Alice", value: "Alice" },
-    { label: "Bob", value: "Bob" },
-    { label: "Charlie", value: "Charlie" },
-    { label: "Diana", value: "Diana" },
-    { label: "Eve", value: "Eve" },
+  const friends: Member[] = [
+    { id: 1, label: "Alice", value: "Alice" },
+    { id: 2, label: "Bob", value: "Bob" },
+    { id: 3, label: "Charlie", value: "Charlie" },
+    { id: 4, label: "Diana", value: "Diana" },
+    { id: 5, label: "Eve", value: "Eve" },
   ];
 
-  const handleCreateChat = (data: { chatName?: string; members: string[] }) => {
-    console.log("New Chat Created:", data);
+  const handleCreateChat = async (data: {
+    chatName?: string;
+    members: Member[];
+  }) => {
+    const url = `${API_URL}/chatroom`;
+
+    const creatorId = Number(await AsyncStorage.getItem("userId"));
+    const memberIds = data.members.map((m) => m.id);
+
+    const postData = {
+      roomName: data.chatName,
+      creatorId: creatorId,
+      members: memberIds,
+    };
+
+    console.log(postData);
+    HttpService.post(url, postData).subscribe((result) => console.log(result));
   };
 
   return (

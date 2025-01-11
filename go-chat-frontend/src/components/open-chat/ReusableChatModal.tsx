@@ -13,16 +13,17 @@ import {
   Input,
 } from "@chakra-ui/react";
 import Select, { MultiValue } from "react-select";
+import { Member } from "./CreateNewChat";
 
 interface ReusableChatModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: { chatName?: string; members: string[] }) => void;
+  onSubmit: (data: { chatName?: string; members: Member[] }) => void;
   title: string;
   initialChatName?: string;
-  initialSelectedMembers?: string[];
+  initialSelectedMembers?: Member[];
   placeholderText?: string;
-  friends: { label: string; value: string }[]; // Dropdown options
+  friends: Member[]; // Dropdown options
   allowChatName?: boolean; // Show/hide chat name input
 }
 
@@ -38,7 +39,7 @@ const ReusableChatModal = ({
   allowChatName = true,
 }: ReusableChatModalProps) => {
   const [chatName, setChatName] = useState(initialChatName);
-  const [selectedMembers, setSelectedMembers] = useState<string[]>(
+  const [selectedMembers, setSelectedMembers] = useState<Member[]>(
     initialSelectedMembers
   );
 
@@ -73,18 +74,25 @@ const ReusableChatModal = ({
             </FormLabel>
             <Select
               isMulti
-              options={friends}
+              options={friends.map((friend) => ({
+                label: friend.label.toString(), // Convert numeric label to string for display
+                value: friend.value,
+              }))}
               placeholder={placeholderText}
               onChange={(
                 selectedOptions: MultiValue<{ label: string; value: string }>
               ) =>
                 setSelectedMembers(
-                  selectedOptions.map((option) => option.value)
+                  selectedOptions.map(
+                    (option) =>
+                      friends.find((friend) => friend.value === option.value)!
+                  )
                 )
               }
-              value={friends.filter((friend) =>
-                selectedMembers.includes(friend.value)
-              )}
+              value={selectedMembers.map((member) => ({
+                label: member.label.toString(),
+                value: member.value,
+              }))}
             />
           </FormControl>
         </ModalBody>
