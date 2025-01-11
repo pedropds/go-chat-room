@@ -32,8 +32,8 @@ func Init(db *gorm.DB) *gin.Engine {
 	}
 
 	// create ChatRoom Dependencies
-	var chatRoomRepository model.ChatRoomRepository = &model.ChatRoomRepositoryImpl{Db: db}
 	var membershipRepository model.MembershipRepository = &model.MembershipRepositoryImpl{Db: db}
+	var chatRoomRepository model.ChatRoomRepository = &model.ChatRoomRepositoryImpl{Db: db, MembershipRepository: membershipRepository}
 	var chatRoomService service.ChatRoomService = &service.ChatRoomServiceImpl{Repository: chatRoomRepository}
 	var membershipService service.MembershipService = &service.MembershipServiceImpl{Repository: membershipRepository}
 	var chatRoomController controller.ChatRoomController = &controller.ChatRoomControllerImpl{

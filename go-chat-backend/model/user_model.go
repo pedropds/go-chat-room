@@ -25,5 +25,6 @@ type UserRequest struct {
 
 type UserToken struct {
 	Username string `json:"username"`
+	UserId int64 `json:"userId"`
 	Token    string `json:"token"`
 }

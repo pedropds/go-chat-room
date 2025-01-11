@@ -1,11 +1,12 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
 	"go-chat-backend/model"
 	"go-chat-backend/service"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type ChatRoomController interface {
@@ -35,14 +36,14 @@ func (cnt *ChatRoomControllerImpl) GetAllChatRoomsForUser(c *gin.Context) {
 }
 
 func (cnt *ChatRoomControllerImpl) CreateChatRoom(c *gin.Context) {
-	var chatRoom model.ChatRoom
+	var chatRoomCreation model.ChatRoomCreation
 
-	if err := c.ShouldBind(&chatRoom); err != nil {
+	if err := c.ShouldBind(&chatRoomCreation); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	createdChatRoom := cnt.ChatRoomService.CreateChatRoom(chatRoom)
+	createdChatRoom := cnt.ChatRoomService.CreateChatRoom(chatRoomCreation)
 	c.JSON(http.StatusOK, createdChatRoom)
 }
 

@@ -1,16 +1,20 @@
 package model
 
 import (
+	"errors"
+	"time"
+
 	"gorm.io/gorm"
 )
 
 type ChatRoomRepository interface {
 	GetAllChatRoomsForUser(userId int64) []ChatRoom
-	CreateChatRoom(chatRoom ChatRoom) ChatRoom
+	CreateChatRoom(chatRoomCreation ChatRoomCreation) ChatRoom
 }
 
 type ChatRoomRepositoryImpl struct {
 	Db *gorm.DB
+	MembershipRepository MembershipRepository
 }
 
 func (ChatRoom) TableName() string {
@@ -29,12 +33,42 @@ func (r *ChatRoomRepositoryImpl) GetAllChatRoomsForUser(userId int64) []ChatRoom
 	return chatRooms
 }
 
-func (r *ChatRoomRepositoryImpl) CreateChatRoom(chatRoom ChatRoom) ChatRoom {
-	result := r.Db.Create(&chatRoom)
+func (r *ChatRoomRepositoryImpl) CreateChatRoom(chatRoomCreation ChatRoomCreation) ChatRoom {
+	var returnChatRoom ChatRoom
+
+	r.Db.Transaction(func(tx *gorm.DB) error {
+		var chatRoom ChatRoom
+		chatRoom.CreatorId = 1
+		chatRoom.RoomName = chatRoomCreation.RoomName
+		chatRoom.CreatedAt = time.Now().Format(time.RFC3339)
+
+		chatroomCreatedResult, error := r.CreateChatRoomPrivate(tx, chatRoom)
+
+		if(error != nil) {
+			return error
+		}
+
+		result := r.MembershipRepository.JoinChatRoomListTx(tx, chatRoomCreation.Members, chatroomCreatedResult.RoomId)
+
+		if(!result) {
+			return errors.New("error adding members into chatRoom")
+		}
+
+		returnChatRoom = chatroomCreatedResult
+
+		return nil
+	})
+
+	return returnChatRoom
+}
+
+func (r *ChatRoomRepositoryImpl) CreateChatRoomPrivate(tx *gorm.DB, chatRoom ChatRoom) (ChatRoom, error) {
+	// Use tx instead of r.Db to ensure the operation is part of the transaction
+	result := tx.Create(&chatRoom)
 
 	if result.Error != nil {
-		return ChatRoom{}
+		return ChatRoom{}, result.Error
 	}
-
-	return chatRoom
+	return chatRoom, nil
 }
+

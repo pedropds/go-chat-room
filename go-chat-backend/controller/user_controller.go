@@ -1,11 +1,12 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
 	"go-chat-backend/model"
 	"go-chat-backend/service"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type UserController interface {
@@ -35,7 +36,7 @@ func (cnt *UserControllerImpl) Login(c *gin.Context) {
 	}
 
 	tokenString, _ := service.GenerateJWT(user)
-	token := model.UserToken{Token: tokenString, Username: user.Username}
+	token := model.UserToken{Token: tokenString, Username: user.Username, UserId: int64(user.UserId)}
 
 	c.JSON(http.StatusOK, token)
 }

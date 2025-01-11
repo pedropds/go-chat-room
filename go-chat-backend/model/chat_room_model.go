@@ -6,3 +6,9 @@ type ChatRoom struct {
 	CreatedAt string `json:"createdAt,omitempty"`
 	CreatorId int64  `json:"creatorId,omitempty"`
 }
+
+type ChatRoomCreation struct {
+	RoomName  string `json:"roomName,omitempty"`
+	CreatorId int64  `json:"creatorId,omitempty"`
+	Members [] int64 `json:"members,omitempty"`
+}

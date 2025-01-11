@@ -1,9 +1,14 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type MembershipRepository interface {
 	JoinChatRoom(userId int64, chatRoomId int64) bool
+	JoinChatRoomListTx(tx *gorm.DB, userId []int64, chatRoomId int64) bool
 }
 
 type MembershipRepositoryImpl struct {
@@ -22,9 +27,22 @@ func (r *MembershipRepositoryImpl) JoinChatRoom(userId int64, chatRoomId int64) 
 
 	result := r.Db.Create(&membership)
 
-	if result.Error != nil {
-		return false
+	return result.Error == nil
+}
+
+func (r *MembershipRepositoryImpl) JoinChatRoomListTx(tx *gorm.DB, userIds []int64, chatRoomId int64) bool {
+	// Prepare a slice of Membership for batch insert
+	memberships := make([]Membership, len(userIds))
+	for i, userId := range userIds {
+		memberships[i] = Membership{
+			RoomId: chatRoomId,
+			UserId: userId,
+			JoinedAt: time.Now().Format(time.RFC3339),
+		}
 	}
 
-	return true
+	// Perform batch insert
+	result := tx.Create(&memberships)
+
+	return result.Error == nil
 }
