@@ -17,10 +17,6 @@ const OpenChat = ({ navigation, route }: OpenChatProps) => {
   const [chatMessages, setChatMessages] = useState<ChatMessageDTO[]>([]);
   const [chatRoom, setChatRoom] = useState<ChatRoomDTO | null>(null);
   const [username, setUsername] = useState<string | null>(null);
-  const [visible, setVisible] = useState(false);
-
-  const openMenu = useCallback(() => setVisible(true), []);
-  const closeMenu = useCallback(() => setVisible(false), []);
 
   const loadChatMessages = useCallback(async (chatRoomId: number) => {
     const url = `${API_URL}/message/${chatRoomId}`;
@@ -85,19 +81,28 @@ const OpenChat = ({ navigation, route }: OpenChatProps) => {
           style={styles.list}
           data={chatMessages}
           keyExtractor={(item, index) => `${item.roomId}-${index}`}
-          renderItem={({ item }) => {
-            const messageBoxStyle =
-              item.username === username
-                ? styles.messageFromMe
-                : styles.messageFromOther;
+          renderItem={({ item, index }) => {
+            const isMessageFromMe = item.username === username;
+            const isFirstMessageFromUser =
+              index === 0 || chatMessages[index - 1].username !== item.username;
+
+            const messageBoxStyle = isMessageFromMe
+              ? styles.messageFromMe
+              : styles.messageFromOther;
 
             return (
-              <View style={[messageBoxStyle]}>
-                <Text style={styles.messageText}>{item.content}</Text>
+              <View>
+                {!isMessageFromMe && isFirstMessageFromUser && (
+                  <Text style={styles.usernameText}>{item.username}</Text>
+                )}
+                <View style={[messageBoxStyle]}>
+                  <Text style={styles.messageText}>{item.content}</Text>
+                </View>
               </View>
             );
           }}
         />
+
         <OpenChatSendMessage onSend={handleSendMessage} />
       </View>
     </PaperProvider>
@@ -138,6 +143,14 @@ const styles = StyleSheet.create({
   messageText: {
     fontSize: 16,
     color: THEME_COLORS.ACTIVE_SCREEN_TAB,
+  },
+  usernameText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    marginBottom: 5,
+    color: THEME_COLORS.ACTIVE_SCREEN_TAB,
+    alignSelf: "flex-start",
+    paddingLeft: 8,
   },
 });
 
