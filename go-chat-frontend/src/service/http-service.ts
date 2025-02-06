@@ -33,11 +33,13 @@ export class HttpService {
       this.socket.onclose = (event) => {
         console.log("WebSocket connection closed:", event);
         this.socket = null;
+        this.clearMessageListeners(); // Clean up listeners when closing the connection
       };
 
       this.socket.onerror = (event) => {
         console.error("WebSocket error:", event);
         this.socket = null;
+        this.clearMessageListeners(); // Clean up listeners on error
       };
     }
   }
@@ -56,5 +58,10 @@ export class HttpService {
 
   static onWebSocketMessage(listener: (message: MessageEvent) => void): void {
     this.messageListeners.push(listener);
+  }
+
+  // Method to clear all message listeners
+  private static clearMessageListeners(): void {
+    this.messageListeners = [];
   }
 }
