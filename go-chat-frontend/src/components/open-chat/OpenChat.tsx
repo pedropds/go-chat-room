@@ -35,19 +35,21 @@ const OpenChat = ({ navigation, route }: OpenChatProps) => {
   }, []);
 
   useEffect(() => {
-    (async () => {
+    const unsubscribe = navigation.addListener("focus", async () => {
       const room: ChatRoomDTO = route.params.chatRoom;
       const user = await AsyncStorage.getItem("loggedInUsername");
 
       setChatRoom(room);
       setUsername(user);
       loadChatMessages(room.roomId);
-    })();
+    });
 
+    // Cleanup the listener when the screen is unfocused
     return () => {
+      unsubscribe();
       HttpService.disconnectWebSocket();
     };
-  }, [route.params.chatRoom, loadChatMessages]);
+  }, [navigation, route.params.chatRoom, loadChatMessages]);
 
   const handleSendMessage = useCallback(
     (text: string) => {

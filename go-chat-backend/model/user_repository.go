@@ -9,6 +9,7 @@ type UserRepository interface {
 	GetUserById(userId int64) User
 	CreateUser(user User) User
 	Login(loginInfo LoginRequest) User
+	GetFriends(userId int64) []User 
 }
 
 type UserRepositoryImpl struct {
@@ -43,4 +44,19 @@ func (r *UserRepositoryImpl) Login(loginInfo LoginRequest) User {
 		return user
 	}
 	return User{}
+}
+
+func (r *UserRepositoryImpl) GetFriends(userId int64) []User {
+	var friends []User
+
+	query := `
+		SELECT appuser.*
+		FROM friendships
+		JOIN appuser 
+		ON (appuser.user_id = friendships.user1_id AND friendships.user2_id = ?)
+		OR (appuser.user_id = friendships.user2_id AND friendships.user1_id = ?)
+	`
+	r.Db.Raw(query, userId, userId).Scan(&friends)
+
+	return friends
 }

@@ -27,7 +27,7 @@ const OpenChatHeader = ({
 
   const handleBackButtonPress = useCallback(() => {
     onBackButtonPress();
-    navigation.goBack();
+    navigation.navigate("Chats");
   }, [onBackButtonPress, navigation]);
 
   const chatTitle = chatRoom?.roomName ?? "Chat";
