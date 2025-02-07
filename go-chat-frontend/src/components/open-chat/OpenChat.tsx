@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     maxWidth: "80%",
     alignSelf: "flex-start",
-    backgroundColor: "lightseagreen",
+    backgroundColor: "#4A90E2",
   },
   messageText: {
     fontSize: 16,
