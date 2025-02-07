@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import ReusableChatModal from "./ReusableChatModal";
 import { HttpService } from "../../service/http-service";
@@ -6,21 +6,31 @@ import { API_URL } from "../../Constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export interface Member {
-  id: number;
-  label: string;
-  value: string;
+  userId: number;
+  username: string;
+  email: string;
 }
 
 const CreateNewChat = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [friends, setFriends] = useState([]);
 
-  const friends: Member[] = [
-    { id: 1, label: "Alice", value: "Alice" },
-    { id: 2, label: "Bob", value: "Bob" },
-    { id: 3, label: "Charlie", value: "Charlie" },
-    { id: 4, label: "Diana", value: "Diana" },
-    { id: 5, label: "Eve", value: "Eve" },
-  ];
+  useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        const creatorId = Number(await AsyncStorage.getItem("userId"));
+        const url = `${API_URL}/user/friends/${creatorId}`;
+
+        HttpService.get(url, {}).subscribe((friends) =>
+          setFriends(friends.data)
+        );
+      } catch (error) {
+        console.error("Error fetching friends:", error);
+      }
+    };
+
+    fetchFriends();
+  }, []);
 
   const handleCreateChat = async (data: {
     chatName?: string;
@@ -29,7 +39,7 @@ const CreateNewChat = () => {
     const url = `${API_URL}/chatroom`;
 
     const creatorId = Number(await AsyncStorage.getItem("userId"));
-    const memberIds = data.members.map((m) => m.id);
+    const memberIds = data.members.map((m) => m.userId);
 
     const postData = {
       roomName: data.chatName,

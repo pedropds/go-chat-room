@@ -49,12 +49,12 @@ func Init(db *gorm.DB) *gin.Engine {
 	r.POST("/user/login", userController.Login)
 
 	userGroup := r.Group("/user")
+	userGroup.GET("/friends/:userId", userController.GetFriendsForUser)
 	userGroup.Use(Authenticate())
 	{
 		userGroup.GET("", userController.GetAllUsers)
 		userGroup.GET("/:userId", userController.GetUserById)
 		userGroup.POST("", userController.CreateUser)
-		userGroup.GET("/friends/:userId", userController.GetFriendsForUser)
 	}
 
 	//Message endpoints

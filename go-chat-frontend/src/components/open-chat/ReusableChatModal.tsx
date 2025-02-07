@@ -75,8 +75,8 @@ const ReusableChatModal = ({
             <Select
               isMulti
               options={friends.map((friend) => ({
-                label: friend.label.toString(), // Convert numeric label to string for display
-                value: friend.value,
+                label: friend.username,
+                value: friend.username,
               }))}
               placeholder={placeholderText}
               onChange={(
@@ -85,13 +85,15 @@ const ReusableChatModal = ({
                 setSelectedMembers(
                   selectedOptions.map(
                     (option) =>
-                      friends.find((friend) => friend.value === option.value)!
+                      friends.find(
+                        (friend) => friend.username === option.value
+                      )!
                   )
                 )
               }
               value={selectedMembers.map((member) => ({
-                label: member.label.toString(),
-                value: member.value,
+                label: member.username,
+                value: member.username,
               }))}
             />
           </FormControl>

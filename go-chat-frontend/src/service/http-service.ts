@@ -5,8 +5,19 @@ export class HttpService {
   private static messageListeners: ((message: MessageEvent) => void)[] = [];
   private static socket: WebSocket | null = null;
 
-  static get(url: string, params: any): Observable<any> {
-    return from(axios.get(url, { params }));
+  static get(url: string, params: any, token?: string): Observable<any> {
+    const headers: any = {};
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    return from(
+      axios.get(url, {
+        params,
+        headers,
+      })
+    );
   }
 
   static post(url: string, data: any): Observable<any> {
