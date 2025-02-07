@@ -1,9 +1,10 @@
 package service
 
 import (
-	"github.com/golang-jwt/jwt"
 	"go-chat-backend/model"
 	"time"
+
+	"github.com/golang-jwt/jwt"
 )
 
 type UserService interface {
@@ -11,6 +12,7 @@ type UserService interface {
 	GetUserById(userId int64) model.User
 	CreateUser(user model.User) model.User
 	Login(loginInfo model.LoginRequest) model.User
+	GetFriendsForUser(userId int64) []model.User 
 }
 
 type UserServiceImpl struct {
@@ -31,6 +33,10 @@ func (s *UserServiceImpl) GetUserById(userId int64) model.User {
 
 func (s *UserServiceImpl) CreateUser(user model.User) model.User {
 	return s.Repository.CreateUser(user)
+}
+
+func (s *UserServiceImpl) GetFriendsForUser(userId int64) []model.User {
+	return s.Repository.GetFriendsForUser(userId)
 }
 
 func GenerateJWT(user model.User) (string, error) {

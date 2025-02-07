@@ -9,7 +9,7 @@ type UserRepository interface {
 	GetUserById(userId int64) User
 	CreateUser(user User) User
 	Login(loginInfo LoginRequest) User
-	GetFriends(userId int64) []User 
+	GetFriendsForUser(userId int64) []User 
 }
 
 type UserRepositoryImpl struct {
@@ -46,7 +46,7 @@ func (r *UserRepositoryImpl) Login(loginInfo LoginRequest) User {
 	return User{}
 }
 
-func (r *UserRepositoryImpl) GetFriends(userId int64) []User {
+func (r *UserRepositoryImpl) GetFriendsForUser(userId int64) []User {
 	var friends []User
 
 	query := `

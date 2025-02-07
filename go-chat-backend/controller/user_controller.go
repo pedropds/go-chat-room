@@ -14,6 +14,7 @@ type UserController interface {
 	GetUserById(c *gin.Context)
 	CreateUser(c *gin.Context)
 	Login(c *gin.Context)
+	GetFriendsForUser(c *gin.Context)
 }
 
 type UserControllerImpl struct {
@@ -70,4 +71,16 @@ func (cnt *UserControllerImpl) CreateUser(c *gin.Context) {
 	userResult := cnt.Service.CreateUser(user)
 
 	c.JSON(http.StatusOK, userResult)
+}
+
+func (cnt *UserControllerImpl) GetFriendsForUser(c *gin.Context) {
+	userId := c.Param("userId")
+	intVar, err := strconv.ParseInt(userId, 0, 8)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	users := cnt.Service.GetFriendsForUser(intVar)
+	c.JSON(http.StatusOK, users)
 }
