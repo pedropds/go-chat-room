@@ -4,6 +4,7 @@ import ReusableChatModal from "./ReusableChatModal";
 import { HttpService } from "../../service/http-service";
 import { API_URL } from "../../Constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ChatRoomDTO } from "../../model/chat.model";
 
 export interface Member {
   userId: number;
@@ -11,26 +12,24 @@ export interface Member {
   email: string;
 }
 
-const CreateNewChat = () => {
+const CreateNewChat = ({
+  setChatList,
+}: {
+  setChatList: React.Dispatch<React.SetStateAction<ChatRoomDTO[]>>;
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [friends, setFriends] = useState([]);
 
-  useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        const creatorId = Number(await AsyncStorage.getItem("userId"));
-        const url = `${API_URL}/user/friends/${creatorId}`;
+  const fetchFriends = async () => {
+    try {
+      const creatorId = Number(await AsyncStorage.getItem("userId"));
+      const url = `${API_URL}/user/friends/${creatorId}`;
 
-        HttpService.get(url, {}).subscribe((friends) =>
-          setFriends(friends.data)
-        );
-      } catch (error) {
-        console.error("Error fetching friends:", error);
-      }
-    };
-
-    fetchFriends();
-  }, []);
+      HttpService.get(url, {}).subscribe((friends) => setFriends(friends.data));
+    } catch (error) {
+      console.error("Error fetching friends:", error);
+    }
+  };
 
   const handleCreateChat = async (data: {
     chatName?: string;
@@ -48,14 +47,21 @@ const CreateNewChat = () => {
     };
 
     console.log(postData);
-    HttpService.post(url, postData).subscribe((result) => console.log(result));
+    HttpService.post(url, postData).subscribe((result) => {
+      console.log(result.data);
+      // Add the new chat to the chatList in the parent
+      setChatList((prevChatList) => [...prevChatList, result.data]);
+    });
   };
 
   return (
     <View style={styles.button}>
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => setIsModalOpen(true)}
+        onPress={async () => {
+          await fetchFriends(); // Fetch friends each time before opening the modal
+          setIsModalOpen(true);
+        }}
       >
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>

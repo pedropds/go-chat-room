@@ -38,7 +38,7 @@ func (r *ChatRoomRepositoryImpl) CreateChatRoom(chatRoomCreation ChatRoomCreatio
 
 	r.Db.Transaction(func(tx *gorm.DB) error {
 		var chatRoom ChatRoom
-		chatRoom.CreatorId = 1
+		chatRoom.CreatorId = chatRoomCreation.CreatorId
 		chatRoom.RoomName = chatRoomCreation.RoomName
 		chatRoom.CreatedAt = time.Now().Format(time.RFC3339)
 
@@ -47,8 +47,10 @@ func (r *ChatRoomRepositoryImpl) CreateChatRoom(chatRoomCreation ChatRoomCreatio
 		if(error != nil) {
 			return error
 		}
+		// Create a new list that includes both the CreatorId and member IDs
+		allMembers := append([]int64{chatRoomCreation.CreatorId}, chatRoomCreation.Members...)
 
-		result := r.MembershipRepository.JoinChatRoomListTx(tx, chatRoomCreation.Members, chatroomCreatedResult.RoomId)
+		result := r.MembershipRepository.JoinChatRoomListTx(tx, allMembers, chatroomCreatedResult.RoomId)
 
 		if(!result) {
 			return errors.New("error adding members into chatRoom")

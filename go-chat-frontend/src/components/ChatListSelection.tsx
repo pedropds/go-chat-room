@@ -80,7 +80,7 @@ const ChatList = ({ navigation }: ChatListProps) => {
         />
       )}
       <View style={styles.createChat}>
-        <CreateNewChat />
+        <CreateNewChat setChatList={setChatList} />
       </View>
     </Animated.View>
   );

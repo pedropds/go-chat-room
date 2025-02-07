@@ -46,7 +46,7 @@ const OpenChat = ({ navigation, route }: OpenChatProps) => {
 
     // Cleanup the listener when the screen is unfocused
     return () => {
-      unsubscribe();
+      //unsubscribe();
       HttpService.disconnectWebSocket();
     };
   }, [navigation, route.params.chatRoom, loadChatMessages]);
