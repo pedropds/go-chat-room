@@ -2,7 +2,7 @@
 
 ## Overview
 
-Go-Chat-Room is a mobile messaging application built with a modern tech stack to provide seamless communication between users. It features a user-friendly interface for creating and managing chat groups, sending messages, and interacting with friends in real time.
+Go-Chat-Room is a mobile messaging application built with a modern tech stack to provide easy communication between users. It features a user-friendly interface for creating and managing chat groups, sending messages, and interacting with friends in real time.
 
 The front end is built using **React Native**, ensuring compatibility across Android and iOS devices. The back end is powered by **Go** and the **Gin Web Framework**, delivering a high-performance API for managing authentication, chats, and messaging services.
 
