@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     padding: 10,
-    borderTopWidth: 1,
+    borderBottomWidth: 1,
   },
   text: {
     display: "flex",

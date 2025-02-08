@@ -10,6 +10,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL, THEME_COLORS } from "../Constants";
 import axios from "axios";
+import { white } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 
 interface LoginScreenProps {
   onLogin: () => void;
@@ -76,6 +77,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 20,
+    color: "white",
   },
   input: {
     width: "40%",
