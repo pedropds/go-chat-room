@@ -35,30 +35,35 @@ Below are some key screens showcasing the app’s features:
 
 ### Login Page
 
-![Login Page Screenshot](demo/login-page.png)
+<img src="demo/login-page.png" alt="Login Page Screenshot" width="300px">
+
 Description: A simple and secure login interface.
 
 ### Chat Selection
 
-![Chat Selection Screenshot](demo/chat-selection-page.png)
+<img src="demo/chat-selection-page.png" alt="Chat Selection Screenshot" width="300px">
+
 Description: This is the main page. View existing chats and create new ones here.
 
 ### Create Chat
 
-![Create Chat Screenshot](demo/create-new-chat1.png)
-![Create Chat Screenshot](demo/create-new-chat2.png)
+<img src="demo/create-new-chat1.png" alt="Create Chat Screenshot" width="300px"> <img src="demo/create-new-chat2.png" alt="Create Chat Screenshot" width="300px">
+
 Description: Easily name a chat and invite friends.
 
 ### Chat Window
 
-![Chat Window Screenshot](demo/open-chat.png)
+<img src="demo/open-chat.png" alt="Chat Window Screenshot" width="300px">
+
 Description: Join conversations and send messages in real-time.
 
 ---
 
 ## Video Demos
 
-- [Sending Messages in a Chat](demo/chat-demo.mp4)
+<img src="demo/chat-demo.gif" alt="Sending Messages in a Chat">
+
+Description: Sending and Receiving messages in real time.
 
 ---
 
