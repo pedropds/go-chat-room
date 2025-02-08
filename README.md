@@ -1,8 +1,8 @@
-# Go-Chat-App
+# Go-Chat-Room
 
 ## Overview
 
-Go-Chat-App is a mobile messaging application built with a modern tech stack to provide seamless communication between users. It features a user-friendly interface for creating and managing chat groups, sending messages, and interacting with friends in real time.
+Go-Chat-Room is a mobile messaging application built with a modern tech stack to provide seamless communication between users. It features a user-friendly interface for creating and managing chat groups, sending messages, and interacting with friends in real time.
 
 The front end is built using **React Native**, ensuring compatibility across Android and iOS devices. The back end is powered by **Go** and the **Gin Web Framework**, delivering a high-performance API for managing authentication, chats, and messaging services.
 
@@ -71,8 +71,8 @@ Description: Sending and Receiving messages in real time.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/go-chat-app.git
-   cd go-chat-app
+   git clone https://github.com/pedropds/go-chat-room.git
+   cd go-chat-room
    ```
 2. Install dependencies for the front end:
    ```bash
