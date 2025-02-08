@@ -39,7 +39,7 @@ func (r *UserRepositoryImpl) CreateUser(user User) User {
 
 func (r *UserRepositoryImpl) Login(loginInfo LoginRequest) User {
 	var user User
-	r.Db.Where("username = ? AND password = ?", loginInfo.Username, loginInfo.Password).First(&user)
+	r.Db.Where(&User{Username: loginInfo.Username, Password: loginInfo.Password}).First(&user)
 	if user.UserId > 0 {
 		return user
 	}
