@@ -63,7 +63,7 @@ Description: Join conversations and send messages in real-time.
 
 <img src="demo/chat-demo.gif" alt="Sending Messages in a Chat">
 
-Description: Sending and Receiving messages in real time, between two different users.
+Description: Sending and Receiving messages in real-time, between two different users.
 
 ---
 
